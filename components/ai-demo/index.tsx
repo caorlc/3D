@@ -6,7 +6,6 @@ import MultiTurnChatDemo from "@/components/ai-demo/MultiTurnChatDemo";
 import SingleTurnChatDemo from "@/components/ai-demo/SingleTurnChatDemo";
 import TextToImageDemo from "@/components/ai-demo/TextToImageDemo";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import {
   Film,
   ImageDown,
@@ -120,7 +119,7 @@ export default function AIDemo() {
 
       <div className="space-y-24 w-full">
         {navItems.map((item) => (
-          <motion.section
+          <section
             key={item.id}
             id={item.id}
             ref={(el) => {
@@ -164,7 +163,7 @@ export default function AIDemo() {
                 <DemoComponent id={item.id} />
               </div>
             </div>
-          </motion.section>
+          </section>
         ))}
       </div>
     </div>
