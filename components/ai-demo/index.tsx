@@ -90,7 +90,7 @@ export default function AIDemo() {
     const section = sectionRefs.current[id];
     if (section) {
       window.scrollTo({
-        top: section.offsetTop - 100,
+        top: section.offsetTop + 150,
         behavior: "smooth",
       });
     }
