@@ -22,7 +22,13 @@ import { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
+import { Inter as FontSans } from "next/font/google";
 import { notFound } from "next/navigation";
+
+export const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 type MetadataProps = {
   params: Promise<{ locale: string }>;
@@ -89,7 +95,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale || DEFAULT_LOCALE} suppressHydrationWarning>
       <head />
-      <body className={cn("min-h-screen bg-background flex flex-col")}>
+      <body
+        className={cn(
+          "min-h-screen bg-background flex flex-col",
+          fontSans.variable
+        )}
+      >
         <AuthProvider>
           <NextIntlClientProvider messages={messages}>
             <ThemeProvider
