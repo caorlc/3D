@@ -1,29 +1,19 @@
 import { NewsletterWelcomeEmail } from '@/emails/newsletter-welcome';
 import { normalizeEmail, validateEmail } from '@/lib/email';
 import resend from '@/lib/resend';
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
+import { checkRateLimit } from '@/lib/upstash';
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID!;
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+const NEWSLETTER_RATE_LIMIT = {
+  prefix: process.env.UPSTASH_REDIS_NEWSLETTER_RATE_LIMIT_KEY || 'newsletter_rate_limit',
+  maxRequests: parseInt(process.env.DAY_MAX_SUBMISSIONS || '10'),
+  window: '1 d'
+};
 
-const REDIS_RATE_LIMIT_KEY = process.env.UPSTASH_REDIS_NEWSLETTER_RATE_LIMIT_KEY || 'newsletter_rate_limit';
-const DAY_MAX_SUBMISSIONS = parseInt(process.env.DAY_MAX_SUBMISSIONS || '10');
-
-const limiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(DAY_MAX_SUBMISSIONS, '1d'),
-  prefix: REDIS_RATE_LIMIT_KEY,
-});
-
-async function checkRateLimit(locale: string) {
-
+async function validateRateLimit(locale: string) {
   const t = await getTranslations({ locale, namespace: 'Footer.Newsletter' });
 
   const headersList = await headers();
@@ -31,7 +21,7 @@ async function checkRateLimit(locale: string) {
     headersList.get('x-forwarded-for') ||
     'unknown';
 
-  const { success } = await limiter.limit(ip);
+  const success = await checkRateLimit(ip, NEWSLETTER_RATE_LIMIT);
   if (!success) {
     throw new Error(t('subscribe.multipleSubmissions'));
   }
@@ -39,7 +29,7 @@ async function checkRateLimit(locale: string) {
 
 export async function subscribeToNewsletter(email: string, locale = 'en') {
   try {
-    await checkRateLimit(locale);
+    await validateRateLimit(locale);
 
     const t = await getTranslations({ locale, namespace: 'Footer.Newsletter' });
 
@@ -91,7 +81,7 @@ export async function subscribeToNewsletter(email: string, locale = 'en') {
 
 export async function unsubscribeFromNewsletter(token: string, locale = 'en') {
   try {
-    await checkRateLimit(locale);
+    await validateRateLimit(locale);
     const t = await getTranslations({ locale, namespace: 'Footer.Newsletter' });
 
     const email = Buffer.from(token, 'base64').toString();
