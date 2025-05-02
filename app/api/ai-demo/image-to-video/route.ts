@@ -137,7 +137,7 @@ export async function POST(req: Request) {
       //   console.error("Failed to upload generated video to R2:", uploadError);
       //   return apiResponse.serverError("Video generation succeeded, but failed to store permanently.");
       // }
-      // // ---- End R2 Upload ----
+      // ---- End R2 Upload ----
 
       // Return the final URL (either R2 or Replicate)
       return apiResponse.success({ videoUrl: replicateVideoUrl });

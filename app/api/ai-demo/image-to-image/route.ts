@@ -82,6 +82,7 @@ export async function POST(req: Request) {
     }
 
     // Optional: Upload result image to R2
+    // ---- Start R2 Upload ----
     // try {
     //   const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
     //   const path = `image-to-images/${provider}/${modelId}/`;
@@ -116,6 +117,7 @@ export async function POST(req: Request) {
     // } catch (uploadError) {
     //   console.error("Failed to upload to R2:", uploadError);
     // }
+    // ---- End R2 Upload ----
 
     const resultImageUrl = `data:image/png;base64,${images[0].base64}`;
     return apiResponse.success({ imageUrl: resultImageUrl });

@@ -15,7 +15,7 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 import { apiResponse } from "@/lib/api-response";
-import { uploadFile } from "@/lib/cloudflare/r2"; // Optional: Uncomment if you want to upload results to R2
+// import { uploadFile } from "@/lib/cloudflare/r2"; // Optional: Uncomment if you want to upload results to R2
 import { openai } from "@ai-sdk/openai";
 import { replicate } from "@ai-sdk/replicate";
 import { xai } from "@ai-sdk/xai";
@@ -91,18 +91,20 @@ export async function POST(req: Request) {
     }
 
     // Optional: Upload result image to R2
-    try {
-      const path = `text-to-images/${provider}/${modelId}/`;
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.png`;
-      const { url: imageUrl, key } = await uploadFile({
-        data: images[0].base64,
-        fileName: fileName,
-        contentType: 'image/png',
-        path: path
-      });
-    } catch (uploadError) {
-      console.error("Failed to upload to R2:", uploadError);
-    }
+    // ---- Start R2 Upload ----
+    // try {
+    //   const path = `text-to-images/${provider}/${modelId}/`;
+    //   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.png`;
+    //   const { url: imageUrl, key } = await uploadFile({
+    //     data: images[0].base64,
+    //     fileName: fileName,
+    //     contentType: 'image/png',
+    //     path: path
+    //   });
+    // } catch (uploadError) {
+    //   console.error("Failed to upload to R2:", uploadError);
+    // }
+    // ---- End R2 Upload ----
 
     return apiResponse.success({ imageUrl: `data:image/png;base64,${images[0].base64}` });
 
