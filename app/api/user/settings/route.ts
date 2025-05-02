@@ -63,7 +63,8 @@ export async function PUT(request: Request) {
 
         if (authUser.user_metadata?.avatar_url) {
           try {
-            const oldAvatarUrl = authUser.user_metadata.avatar_url;
+            const avatarURL = authUser.user_metadata.avatar_url;
+            const oldAvatarUrl = avatarURL && !avatarURL.startsWith('http') ? `https://${avatarURL}` : avatarURL;
             const oldPath = new URL(oldAvatarUrl).pathname.split('/').slice(-3).join('/');
 
             if (oldPath.startsWith(`avatars/${authUser.id}/`)) {
