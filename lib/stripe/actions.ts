@@ -1,7 +1,7 @@
 'use server';
 
 import { InvoicePaymentFailedEmail } from '@/emails/invoice-payment-failed';
-import { resend } from '@/lib/resend';
+import resend from '@/lib/resend';
 import stripe from '@/lib/stripe/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { TablesInsert } from '@/lib/supabase/types';
@@ -433,6 +433,11 @@ export async function sendInvoicePaymentFailedEmail({
 
       try {
         const subject = `Action Required: Payment Failed / 操作提醒：支付失败 / 要対応：お支払いが失敗`; // Example subject
+
+        if (!resend) {
+          console.error('Resend client is not initialized. Cannot send invoice payment failed email.');
+          return;
+        }
 
         await resend.emails.send({
           from: `${process.env.ADMIN_NAME} <${process.env.ADMIN_EMAIL}>`,

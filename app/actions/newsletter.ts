@@ -1,6 +1,6 @@
 import { NewsletterWelcomeEmail } from '@/emails/newsletter-welcome';
 import { normalizeEmail, validateEmail } from '@/lib/email';
-import { resend } from '@/lib/resend';
+import resend from '@/lib/resend';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { getTranslations } from 'next-intl/server';
@@ -48,6 +48,10 @@ export async function subscribeToNewsletter(email: string, locale = 'en') {
 
     if (!isValid) {
       throw new Error(error || t('subscribe.invalidEmail'));
+    }
+
+    if (!resend) {
+      throw new Error('Newsletter service is temporarily unavailable');
     }
 
     await resend.contacts.create({
@@ -98,9 +102,13 @@ export async function unsubscribeFromNewsletter(token: string, locale = 'en') {
       throw new Error(error || t('unsubscribe.invalidEmail'));
     }
 
+    if (!resend) {
+      throw new Error('Newsletter service is temporarily unavailable');
+    }
+
     // check if user exists in audience
     const list = await resend.contacts.list({ audienceId: AUDIENCE_ID });
-    const user = list.data?.data.find((item) => item.email === normalizedEmail);
+    const user = list.data?.data.find((item: any) => item.email === normalizedEmail);
 
     if (!user) {
       throw new Error(t('unsubscribe.notInNewsletter'));
