@@ -6,9 +6,11 @@ import { createClient } from '@/lib/supabase/server';
 // Allowed redirect domain name white list
 // 允许的重定向域名白名单
 // 許可されたリダイレクトドメイン名のホワイトリスト
-const ALLOWED_REDIRECT_HOSTS = (process.env.ALLOWED_REDIRECT_HOSTS?.split(',') || []).concat(
-  process.env.NEXT_PUBLIC_SITE_URL!
-).filter(Boolean) as string[]
+const ALLOWED_REDIRECT_HOSTS = (
+  process.env.NODE_ENV === 'development'
+    ? (process.env.ALLOWED_REDIRECT_HOSTS?.split(',') || [])
+    : []
+).concat(process.env.NEXT_PUBLIC_SITE_URL!).filter(Boolean) as string[]
 
 function isValidRedirectUrl(url: string): boolean {
   try {
