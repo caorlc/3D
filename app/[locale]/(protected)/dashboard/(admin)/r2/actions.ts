@@ -1,15 +1,9 @@
 "use server";
 
-import { createR2Client, deleteFile as deleteR2Util } from "@/lib/cloudflare/r2";
-import { ListObjectsV2Command, _Object } from "@aws-sdk/client-s3";
+import { deleteFile as deleteR2Util, ListedObject, listR2Objects } from "@/lib/cloudflare/r2";
 import { z } from "zod";
 
-export interface R2File {
-  key: string;
-  size: number;
-  lastModified: Date;
-  type: string;
-}
+export type R2File = ListedObject;
 
 export interface ListR2FilesResult {
   files: R2File[];
@@ -44,42 +38,26 @@ export async function listR2Files(
 
   const { categoryPrefix, filterPrefix, continuationToken, pageSize } = validationResult.data;
 
-  if (!process.env.R2_BUCKET_NAME) {
-    console.error("R2_BUCKET_NAME environment variable is not set.");
-    return { files: [], error: "Server configuration error: R2 bucket name not set." };
-  }
-
-  const s3Client = createR2Client();
-  if (!s3Client) {
-    throw new Error("R2 client could not be initialized. Check R2 client environment variables.");
-  }
-
   const searchPrefix = filterPrefix ? `${categoryPrefix}${filterPrefix}` : categoryPrefix;
 
   try {
-    const command = new ListObjectsV2Command({
-      Bucket: process.env.R2_BUCKET_NAME,
-      Prefix: searchPrefix,
-      MaxKeys: pageSize,
-      ContinuationToken: continuationToken,
+    const result = await listR2Objects({
+      prefix: searchPrefix,
+      continuationToken: continuationToken,
+      pageSize: pageSize,
     });
 
-    const response = await s3Client.send(command);
-
-    const files: R2File[] = (response.Contents || []).map((obj: _Object) => ({
-      key: obj.Key ?? 'unknown-key',
-      size: obj.Size ?? 0,
-      type: obj.Key?.split('.').pop() ?? 'unknown-type',
-      lastModified: obj.LastModified ?? new Date(0),
-    }));
+    if (result.error) {
+      return { files: [], error: result.error };
+    }
 
     return {
-      files: files,
-      nextContinuationToken: response.NextContinuationToken,
+      files: result.objects,
+      nextContinuationToken: result.nextContinuationToken,
     };
   } catch (error: any) {
-    console.error("Failed to list files from R2:", error);
-    return { files: [], error: `Failed to list files: ${error.message || 'Unknown R2 error'}` };
+    console.error("Failed to list files using generic R2 lister:", error);
+    return { files: [], error: `Failed to list files: ${error.message || 'Unknown error'}` };
   }
 }
 

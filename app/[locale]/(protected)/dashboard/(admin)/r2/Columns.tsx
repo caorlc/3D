@@ -156,7 +156,7 @@ export const getColumns = (
   {
     accessorKey: "type",
     header: "Type",
-    cell: ({ row }) => row.original.type.toUpperCase() ?? "Unknown",
+    cell: ({ row }) => getFileType(row.original.key).toUpperCase() ?? "Unknown",
   },
   {
     accessorKey: "size",
