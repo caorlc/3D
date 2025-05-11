@@ -13,7 +13,7 @@ export default function DashboardLayout({
         <MobileSidebar />
       </div>
       <div className="flex flex-1">
-        <Sidebar className="hidden md:block w-56 border-r p-4 sticky top-0 h-screen scrollbar-thin" />
+        <Sidebar className="hidden md:block w-56 border-r p-4 sticky top-12 h-screen overflow-auto scrollbar-thin" />
         <main className="flex-1 p-4 md:p-6 mx-auto">{children}</main>
       </div>
     </div>
