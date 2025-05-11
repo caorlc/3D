@@ -47,16 +47,31 @@ async function CategoryTable({ categoryPrefix }: { categoryPrefix: string }) {
     pageSize: PAGE_SIZE,
   });
 
-  const initialTokenMap: Record<number, string | null> = {};
-  if (initialResult.nextContinuationToken) {
-    initialTokenMap[0] = initialResult.nextContinuationToken;
+  if (!initialResult.success || !initialResult.data) {
+    console.error(
+      "Failed to load initial files for category:",
+      categoryPrefix,
+      initialResult.error
+    );
+    return (
+      <div className="text-red-500">
+        Error loading images: {initialResult.error}
+      </div>
+    );
   }
 
-  const initialHasMore = initialResult.nextContinuationToken !== undefined;
+  const { files: initialFiles, nextContinuationToken } = initialResult.data;
+
+  const initialTokenMap: Record<number, string | null> = {};
+  if (nextContinuationToken) {
+    initialTokenMap[0] = nextContinuationToken;
+  }
+
+  const initialHasMore = nextContinuationToken !== undefined;
 
   return (
     <ImagesDataTable
-      initialData={initialResult.files}
+      initialData={initialFiles}
       initialHasMore={initialHasMore}
       initialTokenMap={initialTokenMap}
       categoryPrefix={categoryPrefix}

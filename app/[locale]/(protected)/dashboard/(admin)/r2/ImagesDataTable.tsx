@@ -53,10 +53,9 @@ export function ImagesDataTable({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const handleFetchError = (err: any) => {
-    const errorMessage = err.message || "An unknown error occurred";
-    setError(errorMessage);
-    toast.error("Failed to fetch files", { description: errorMessage });
+  const handleFetchError = (errMessage: string) => {
+    setError(errMessage);
+    toast.error("Failed to fetch files", { description: errMessage });
     setFiles([]);
     setHasMore(false);
     setIsLoading(false);
@@ -97,31 +96,35 @@ export function ImagesDataTable({
           pageSize: pageSize,
         });
 
-        if (result.error) {
+        if (!result.success || !result.data) {
           throw new Error(result.error);
         }
 
-        setFiles(result.files);
-        const nextToken = result.nextContinuationToken;
+        const { files: fetchedFiles, nextContinuationToken } = result.data;
+        setFiles(fetchedFiles);
         console.log(
-          `Received next token for page ${currentPageIndex + 1}: ${nextToken}`
+          `Received next token for page ${
+            currentPageIndex + 1
+          }: ${nextContinuationToken}`
         );
 
         pageTokensRef.current = {
           ...pageTokensRef.current,
-          [currentPageIndex]: nextToken ?? null,
+          [currentPageIndex]: nextContinuationToken ?? null,
         };
 
-        setHasMore(nextToken !== undefined);
+        setHasMore(nextContinuationToken !== undefined);
       } catch (err: any) {
-        handleFetchError(err);
+        handleFetchError(
+          err.message || "An unknown error occurred during fetch"
+        );
       } finally {
         setIsLoading(false);
       }
     };
 
     performFetch();
-  }, [currentPageIndex, categoryPrefix, debouncedFilter, isDeleting]);
+  }, [currentPageIndex, categoryPrefix, debouncedFilter, isDeleting, pageSize]);
 
   useEffect(() => {
     setCurrentPageIndex(0);
@@ -135,9 +138,9 @@ export function ImagesDataTable({
     async (key: string) => {
       setIsDeleting(true);
       toast.info(`Deleting ${key}...`);
-      const result = await deleteR2File({ key });
+      const deleteOpResult = await deleteR2File({ key });
 
-      if (result.success) {
+      if (deleteOpResult.success) {
         toast.success(`Successfully deleted ${key}`);
         setIsLoading(true);
         setError(null);
@@ -159,27 +162,35 @@ export function ImagesDataTable({
             pageSize: pageSize,
           });
 
-          if (listResult.error) throw new Error(listResult.error);
+          if (!listResult.success || !listResult.data) {
+            throw new Error(listResult.error);
+          }
 
-          setFiles(listResult.files);
-          const nextToken = listResult.nextContinuationToken;
+          const { files: refetchedFiles, nextContinuationToken } =
+            listResult.data;
+          setFiles(refetchedFiles);
           pageTokensRef.current = {
             ...pageTokensRef.current,
-            [currentPageIndex]: nextToken ?? null,
+            [currentPageIndex]: nextContinuationToken ?? null,
           };
-          setHasMore(nextToken !== undefined);
+          setHasMore(nextContinuationToken !== undefined);
         } catch (err: any) {
-          handleFetchError(err);
+          handleFetchError(
+            err.message ||
+              "An unknown error occurred during refetch after delete"
+          );
         } finally {
           setIsLoading(false);
           setIsDeleting(false);
         }
       } else {
-        toast.error(`Failed to delete ${key}`, { description: result.error });
+        toast.error(`Failed to delete ${key}`, {
+          description: deleteOpResult.error,
+        });
         setIsDeleting(false);
       }
     },
-    [currentPageIndex, categoryPrefix, debouncedFilter]
+    [currentPageIndex, categoryPrefix, debouncedFilter, pageSize]
   );
 
   const columns = useMemo(

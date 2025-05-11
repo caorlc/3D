@@ -1,17 +1,21 @@
 "use server";
 
+import { actionResponse } from "@/lib/action-response";
 import { deleteFile as deleteR2Util, ListedObject, listR2Objects } from "@/lib/cloudflare/r2";
 import { z } from "zod";
 
 export type R2File = ListedObject;
 
-export interface ListR2FilesResult {
-  files: R2File[];
-  nextContinuationToken?: string;
+export interface ListR2FilesData {
+  success: boolean;
+  data?: {
+    files: R2File[];
+    nextContinuationToken?: string;
+  };
   error?: string;
 }
 
-export interface DeleteR2FileResult {
+export interface DeleteR2FileData {
   success: boolean;
   error?: string;
 }
@@ -29,11 +33,11 @@ const deleteSchema = z.object({
 
 export async function listR2Files(
   input: z.infer<typeof listSchema>
-): Promise<ListR2FilesResult> {
+): Promise<ListR2FilesData> {
   const validationResult = listSchema.safeParse(input);
   if (!validationResult.success) {
     const formattedErrors = validationResult.error.flatten().fieldErrors;
-    return { files: [], error: `Invalid input: ${JSON.stringify(formattedErrors)}` };
+    return actionResponse.badRequest(`Invalid input: ${JSON.stringify(formattedErrors)}`);
   }
 
   const { categoryPrefix, filterPrefix, continuationToken, pageSize } = validationResult.data;
@@ -48,33 +52,33 @@ export async function listR2Files(
     });
 
     if (result.error) {
-      return { files: [], error: result.error };
+      return actionResponse.error(result.error);
     }
 
-    return {
+    return actionResponse.success({
       files: result.objects,
       nextContinuationToken: result.nextContinuationToken,
-    };
+    });
   } catch (error: any) {
     console.error("Failed to list files using generic R2 lister:", error);
-    return { files: [], error: `Failed to list files: ${error.message || 'Unknown error'}` };
+    return actionResponse.error(`Failed to list files: ${error.message || 'Unknown error'}`);
   }
 }
 
-export async function deleteR2File(input: z.infer<typeof deleteSchema>): Promise<DeleteR2FileResult> {
+export async function deleteR2File(input: z.infer<typeof deleteSchema>): Promise<DeleteR2FileData> {
   const validationResult = deleteSchema.safeParse(input);
   if (!validationResult.success) {
     const formattedErrors = validationResult.error.flatten().fieldErrors;
-    return { success: false, error: `Invalid input: ${JSON.stringify(formattedErrors)}` };
+    return actionResponse.badRequest(`Invalid input: ${JSON.stringify(formattedErrors)}`);
   }
 
   const { key } = validationResult.data;
 
   try {
     await deleteR2Util(key);
-    return { success: true };
+    return actionResponse.success();
   } catch (error: any) {
     console.error(`Failed to delete R2 file (${key}):`, error);
-    return { success: false, error: error.message || 'Failed to delete file from R2.' };
+    return actionResponse.error(error.message || 'Failed to delete file from R2.');
   }
 } 
