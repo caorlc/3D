@@ -179,7 +179,7 @@ export function BlogList({
           )}
 
           {!hasMore && posts.length >= 0 && (
-            <p className="text-center text-gray-500 py-8">
+            <p className="text-center text-gray-500 py-8 text-sm">
               {posts.length === 0
                 ? t("noPostsFoundForThisTag")
                 : t("reachedTheEnd")}
