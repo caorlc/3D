@@ -1,4 +1,16 @@
 {
+  "Shared": {
+    "promoCode": {
+      "goToPricing": "/#pricing",
+      "copy": "复制",
+      "copied": "已复制!",
+      "copyToast": "优惠码已复制!",
+      "limitedTimeOffer": "限时特惠",
+      "save": "立省{discount}",
+      "validUntil": "有效期至",
+      "copyAndScroll": "复制代码并查看价格"
+    }
+  },
   "LanguageDetection": {
     "title": "语言建议",
     "description": "检测到你的浏览器语言和当前语言不一样，你随时都可切换语言 👉",

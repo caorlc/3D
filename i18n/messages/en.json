@@ -1,4 +1,16 @@
 {
+  "Shared": {
+    "promoCode": {
+      "goToPricing": "/#pricing",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "copyToast": "Promo code copied!",
+      "limitedTimeOffer": "Limited Time Offer",
+      "save": "Save {discount}",
+      "validUntil": "Valid until",
+      "copyAndScroll": "Copy code and view pricing"
+    }
+  },
   "LanguageDetection": {
     "title": "Language Suggestion",
     "description": "We noticed your browser language differs from the current site language. You can switch languages anytime 👉",
