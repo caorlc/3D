@@ -9,6 +9,7 @@ import { BLOGS_IMAGE_PATH } from '@/config/common';
 import { DEFAULT_LOCALE } from '@/i18n/routing';
 import { apiResponse } from '@/lib/api-response';
 import { uploadFile } from '@/lib/cloudflare/r2';
+import { getErrorMessage } from '@/lib/error-utils';
 import { isAdmin } from '@/lib/supabase/isAdmin';
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
     return apiResponse.success({ url: result.url, key: result.key });
   } catch (error) {
     console.error("API Upload failed:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to upload image.";
+    const errorMessage = getErrorMessage(error);
     return apiResponse.error(errorMessage);
   }
 }

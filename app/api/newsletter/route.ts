@@ -1,6 +1,7 @@
 import { subscribeToNewsletter } from '@/app/actions/newsletter';
 import { DEFAULT_LOCALE } from '@/i18n/routing';
 import { apiResponse } from '@/lib/api-response';
+import { getErrorMessage } from '@/lib/error-utils';
 import { getTranslations } from 'next-intl/server';
 import { headers } from 'next/headers';
 
@@ -22,10 +23,7 @@ export async function POST(request: Request,
     return apiResponse.success(result);
   } catch (error) {
     console.error("Newsletter subscription failed:", error);
-    const message = error instanceof Error ? error.message : 'Server processing request failed';
-    return apiResponse.error(
-      message,
-      error instanceof Error ? 400 : 500
-    );
+    const errorMessage = getErrorMessage(error);
+    return apiResponse.error(errorMessage);
   }
 } 

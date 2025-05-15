@@ -2,6 +2,7 @@
 
 import { Locale } from "@/i18n/routing";
 import { actionResponse } from "@/lib/action-response";
+import { getErrorMessage } from "@/lib/error-utils";
 import { isAdmin } from "@/lib/supabase/isAdmin";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/types";
@@ -55,7 +56,7 @@ export async function listTagsAction({
     return actionResponse.success({ tags: tags || [] });
   } catch (error) {
     console.error("List tags action failed:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to list tags.";
+    const errorMessage = getErrorMessage(error);
     if (errorMessage.includes('permission denied')) {
       return actionResponse.forbidden("Permission denied to view tags.");
     }
@@ -119,7 +120,7 @@ export async function createTagAction({ name, locale }: { name: string, locale: 
 
   } catch (error) {
     console.error("Create tag action failed:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to create tag.";
+    const errorMessage = getErrorMessage(error);
     if (errorMessage.includes('duplicate key value violates unique constraint')) {
       return actionResponse.conflict(`Tag "${name}" already exists.`);
     }
@@ -174,7 +175,7 @@ export async function updateTagAction({ id, name, locale }: { id: string, name: 
 
   } catch (error) {
     console.error("Update tag action failed:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to update tag.";
+    const errorMessage = getErrorMessage(error);
     if (errorMessage.includes('duplicate key value violates unique constraint')) {
       return actionResponse.conflict(`Tag name "${name}" is already in use by another tag.`);
     }
@@ -211,7 +212,7 @@ export async function deleteTagAction({ id, locale }: { id: string, locale: Loca
 
   } catch (error) {
     console.error("Delete tag action failed:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to delete tag.";
+    const errorMessage = getErrorMessage(error);
     if (errorMessage.includes('permission denied')) {
       return actionResponse.forbidden("Permission denied to delete tags.");
     }

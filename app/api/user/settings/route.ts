@@ -1,6 +1,7 @@
 import { DEFAULT_LOCALE } from "@/i18n/routing";
 import { apiResponse } from "@/lib/api-response";
 import { deleteFile, uploadFile } from "@/lib/cloudflare/r2";
+import { getErrorMessage } from "@/lib/error-utils";
 import { createClient } from "@/lib/supabase/server";
 import { AVATAR_ALLOWED_FILE_TYPES, AVATAR_MAX_FILE_SIZE, isValidFullName } from "@/lib/validations";
 import { getTranslations } from "next-intl/server";
@@ -111,8 +112,7 @@ export async function PUT(request: Request) {
     return apiResponse.success({ message: t("toast.updateSuccessDescription") });
   } catch (error) {
     console.error("Settings update error:", error);
-    return apiResponse.serverError(
-      error instanceof Error ? error.message : "Failed to update settings"
-    );
+    const errorMessage = getErrorMessage(error);
+    return apiResponse.serverError(errorMessage);
   }
 } 

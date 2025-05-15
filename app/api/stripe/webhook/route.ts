@@ -1,4 +1,5 @@
 import { apiResponse } from '@/lib/api-response';
+import { getErrorMessage } from '@/lib/error-utils';
 import stripe from '@/lib/stripe/stripe';
 import { handleCheckoutSessionCompleted, handleInvoicePaid, handleInvoicePaymentFailed, handleRefund, handleSubscriptionUpdate } from '@/lib/stripe/webhook-handlers';
 import { headers } from 'next/headers';
@@ -57,7 +58,8 @@ export async function POST(req: Request) {
         return apiResponse.success({ received: true });
       } catch (error) {
         console.error(`Error during sync processing for webhook ${event.type}:`, error);
-        return apiResponse.serverError(`Webhook handler failed during sync processing. Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        const errorMessage = getErrorMessage(error);
+        return apiResponse.serverError(`Webhook handler failed during sync processing. Error: ${errorMessage}`);
       }
     }
   } else {

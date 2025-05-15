@@ -1,6 +1,7 @@
 'use server';
 
 import { InvoicePaymentFailedEmail } from '@/emails/invoice-payment-failed';
+import { getErrorMessage } from '@/lib/error-utils';
 import resend from '@/lib/resend';
 import stripe from '@/lib/stripe/stripe';
 import { createClient } from '@/lib/supabase/server';
@@ -152,11 +153,8 @@ export async function getOrCreateStripeCustomer(
 
   } catch (error) {
     console.error('Error creating Stripe customer or updating Supabase:', error);
-    if (error instanceof Error) {
-      throw new Error(`Stripe customer creation/update failed: ${error.message}`);
-    } else {
-      throw new Error('An unknown error occurred during Stripe customer creation/update.');
-    }
+    const errorMessage = getErrorMessage(error);
+    throw new Error(`Stripe customer creation/update failed: ${errorMessage}`);
   }
 }
 
@@ -206,8 +204,8 @@ export async function createStripePortalSession(): Promise<void> {
 
   } catch (error) {
     console.error('Error preparing Stripe portal session:', error);
-    const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-    redirect(`/stripe-error?message=Failed to open subscription management: ${encodeURIComponent(message)}`);
+    const errorMessage = getErrorMessage(error);
+    redirect(`/stripe-error?message=Failed to open subscription management: ${encodeURIComponent(errorMessage)}`);
   }
 
   if (portalUrl) {
@@ -344,11 +342,8 @@ export async function syncSubscriptionData(
 
   } catch (error) {
     console.error(`Error in syncSubscriptionData for sub ${subscriptionId}, cust ${customerId}:`, error);
-    if (error instanceof Error) {
-      throw new Error(`Subscription sync failed (${subscriptionId}): ${error.message}`);
-    } else {
-      throw new Error(`An unknown error occurred during subscription sync (${subscriptionId}).`);
-    }
+    const errorMessage = getErrorMessage(error);
+    throw new Error(`Subscription sync failed (${subscriptionId}): ${errorMessage}`);
   }
 }
 

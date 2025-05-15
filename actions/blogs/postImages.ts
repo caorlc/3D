@@ -3,6 +3,7 @@
 import { BLOGS_IMAGE_PAGE_SIZE, BLOGS_IMAGE_PATH } from "@/config/common";
 import { actionResponse } from "@/lib/action-response";
 import { deleteFile, listR2Objects, type ListedObject } from "@/lib/cloudflare/r2";
+import { getErrorMessage } from "@/lib/error-utils";
 
 export async function deleteImageAction(key: string) {
   try {
@@ -46,6 +47,7 @@ export async function listBlogImagesAction(
     return actionResponse.success({ files: result.objects, nextContinuationToken: result.nextContinuationToken });
   } catch (error) {
     console.error("List images action failed:", error);
-    return actionResponse.error(error instanceof Error ? error.message : "Failed to list images.");
+    const errorMessage = getErrorMessage(error);
+    return actionResponse.error(errorMessage);
   }
 }

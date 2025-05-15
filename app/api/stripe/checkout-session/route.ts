@@ -1,4 +1,5 @@
 import { apiResponse } from '@/lib/api-response';
+import { getErrorMessage } from '@/lib/error-utils';
 import { getOrCreateStripeCustomer } from '@/lib/stripe/actions';
 import stripe from '@/lib/stripe/stripe';
 import { createClient } from '@/lib/supabase/server';
@@ -116,7 +117,7 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Error creating Stripe Checkout Session:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    const errorMessage = getErrorMessage(error);
     return apiResponse.serverError(errorMessage)
   }
 } 
