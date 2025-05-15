@@ -188,7 +188,7 @@ export function PricesDataTable<TData extends PricingPlan, TValue>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{t("toggleColumns")}</DropdownMenuLabel>
+            <DropdownMenuLabel>{tCommon("toggleColumns")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {table
               .getAllColumns()
