@@ -837,7 +837,8 @@
           "activeStatusDescription": "控制此卡片是否对用户可见。",
           "createPlan": "创建卡片",
           "saveChanges": "保存更改",
-          "cancel": "取消"
+          "cancel": "取消",
+          "pleaseEnterLanguageData": "在你提交之前，请确认[多语言JSON]已更新为最新，这是最终优先渲染到用户端的信息。"
         },
         "API": {
           "missingRequiredFields": "缺少必填字段：environment, card_title",

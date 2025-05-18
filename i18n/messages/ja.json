@@ -837,7 +837,8 @@
           "activeStatusDescription": "このプランをユーザーに表示するかどうかを制御します。",
           "createPlan": "プランを作成",
           "saveChanges": "変更を保存",
-          "cancel": "キャンセル"
+          "cancel": "キャンセル",
+          "pleaseEnterLanguageData": "提出する前に、「言語JSON」フィールドが最新であることを確認してください。これは、すべてのサポートされている言語でユーザーに表示される主要な情報です。"
         },
         "API": {
           "missingRequiredFields": "必須フィールドが不足しています: environment, card_title",

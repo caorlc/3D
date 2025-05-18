@@ -837,7 +837,8 @@
           "activeStatusDescription": "Controls whether this plan is visible to users.",
           "createPlan": "Create Plan",
           "saveChanges": "Save Changes",
-          "cancel": "Cancel"
+          "cancel": "Cancel",
+          "pleaseEnterLanguageData": "Before submitting, please ensure the \"Language JSON\" field is up-to-date. This is the primary information displayed to users across all supported languages."
         },
         "API": {
           "missingRequiredFields": "Missing required fields: environment, card_title",
