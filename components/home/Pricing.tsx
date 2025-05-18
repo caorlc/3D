@@ -57,7 +57,7 @@ export default async function Pricing() {
               plan.lang_jsonb?.[locale] || plan.lang_jsonb?.[DEFAULT_LOCALE];
 
             if (!localizedPlan) {
-              console.error(
+              console.warn(
                 `Missing localization for locale '${locale}' or fallback 'en' for plan ID ${plan.id}`
               );
               return null;
