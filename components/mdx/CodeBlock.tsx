@@ -55,10 +55,7 @@ const CodeBlock = (allProps: CodeBlockProps) => {
         className="absolute top-2.5 right-2.5 z-10 p-1 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-600/70 transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 print:hidden"
         text={codeTextToCopy}
       />
-      <pre
-        {...restPreAttributes}
-        className={`code-block_pre___OLfy ${preClassName || ""}`.trim()}
-      >
+      <pre {...restPreAttributes} className={`${preClassName || ""}`.trim()}>
         {codeElement}
       </pre>
     </div>
