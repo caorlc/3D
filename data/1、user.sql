@@ -52,7 +52,7 @@ USING (auth.uid() = id);
 -- Allow user to update their own profile
   -- Only allows updating specific fields: full_name, avatar_url, invite_code
   -- Add more fields as needed.
-  -- See example usage in /api/user/settings/route.ts -> supabase.rpc('update_my_profile', ...)
+  -- See example usage in /actions/users/settings.ts -> supabase.rpc('update_my_profile', ...)
 CREATE OR REPLACE FUNCTION update_my_profile(
     new_full_name TEXT,
     new_avatar_url TEXT,
