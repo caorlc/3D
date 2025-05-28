@@ -171,6 +171,7 @@ export const columns: ColumnDef<PricingPlan>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row, table }) => {
       const plan = row.original;
 

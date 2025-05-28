@@ -192,6 +192,7 @@ export const getColumns = (
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => (
       <ActionsCell
         file={row.original}
