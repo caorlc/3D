@@ -103,6 +103,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
       throw error;
     } finally {
       setIsLoading(false);
+      setPreviewUrl(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
