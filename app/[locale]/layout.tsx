@@ -2,6 +2,7 @@ import BaiDuAnalytics from "@/app/BaiDuAnalytics";
 import GoogleAdsense from "@/app/GoogleAdsense";
 import GoogleAnalytics from "@/app/GoogleAnalytics";
 import PlausibleAnalytics from "@/app/PlausibleAnalytics";
+import GoogleOneTap from "@/components/auth/GoogleOneTap";
 import Footer from "@/components/footer/Footer";
 import Header from "@/components/header/Header";
 import { LanguageDetectionAlert } from "@/components/LanguageDetectionAlert";
@@ -123,6 +124,7 @@ export default async function LocaleLayout({
             </ThemeProvider>
           </NextIntlClientProvider>
         </AuthProvider>
+        <GoogleOneTap />
         <Toaster />
         <TailwindIndicator />
         <DiscordInviteWidget />
