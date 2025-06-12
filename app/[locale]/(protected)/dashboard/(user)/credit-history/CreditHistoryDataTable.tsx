@@ -104,7 +104,7 @@ export function CreditHistoryDataTable({
         </div>
       )}
 
-      <div className="rounded-md border relative min-h-[200px]">
+      <div className="rounded-md border relative min-h-[200px] max-h-[calc(100vh-270px)] overflow-y-auto">
         {isLoading && (
           <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
