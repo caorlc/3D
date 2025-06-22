@@ -2,7 +2,7 @@
 
 import { DEFAULT_LOCALE } from "@/i18n/routing";
 import { actionResponse } from "@/lib/action-response";
-import { deleteFile, uploadFile } from "@/lib/cloudflare/r2";
+import { deleteFile, serverUploadFile } from "@/lib/cloudflare/r2";
 import { getErrorMessage } from "@/lib/error-utils";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -72,7 +72,7 @@ export async function updateUserSettingsAction({
         const filePath = `avatars/${authUser.id}/`;
 
         const buffer = Buffer.from(await avatar.arrayBuffer());
-        const { url } = await uploadFile({
+        const { url } = await serverUploadFile({
           data: buffer,
           contentType: avatar.type,
           path: filePath,

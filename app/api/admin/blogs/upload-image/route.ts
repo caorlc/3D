@@ -19,7 +19,7 @@ export const runtime = "edge";
 import { BLOGS_IMAGE_PATH } from '@/config/common';
 import { DEFAULT_LOCALE } from '@/i18n/routing';
 import { apiResponse } from '@/lib/api-response';
-import { uploadFile } from '@/lib/cloudflare/r2';
+import { serverUploadFile } from '@/lib/cloudflare/r2';
 import { getErrorMessage } from '@/lib/error-utils';
 import { isAdmin } from '@/lib/supabase/isAdmin';
 import { getTranslations } from 'next-intl/server';
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     const fileExtension = file.type.split("/")[1];
 
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const result = await uploadFile({
+    const result = await serverUploadFile({
       data: fileBuffer,
       fileName: `${prefix}-${timestamp}-${randomString}.${fileExtension}`,
       contentType: file.type,

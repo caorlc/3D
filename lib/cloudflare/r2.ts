@@ -20,7 +20,7 @@ export interface UploadResult {
   key: string;
 }
 
-export const uploadFile = async ({
+export const serverUploadFile = async ({
   data,
   fileName,
   contentType,

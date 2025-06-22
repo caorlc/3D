@@ -15,7 +15,7 @@ export const runtime = "edge";
 
 import { IMAGE_TO_VIDEO_MODELS } from "@/lib/ai/models";
 import { apiResponse } from "@/lib/api-response";
-// import { uploadFile } from "@/lib/cloudflare/r2"; // Optional: Uncomment if you want to upload results to R2
+// import { serverUploadFile } from "@/lib/cloudflare/r2"; // Optional: Uncomment if you want to upload results to R2
 import { ReplicatePredictionResponse } from "@/types/ai";
 import Replicate from "replicate";
 import { z } from 'zod';
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
 
       //   console.log(`Uploading video to R2: ${path}${fileName}`);
 
-      //   const uploadResult = await uploadFile({
+      //   const uploadResult = await serverUploadFile({
       //     data: videoBuffer,
       //     fileName: fileName,
       //     contentType: contentType,

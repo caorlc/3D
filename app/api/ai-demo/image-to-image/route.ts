@@ -16,7 +16,7 @@ export const maxDuration = 60;
 
 import { IMAGE_TO_IMAGE_MODELS } from "@/lib/ai/models";
 import { apiResponse } from "@/lib/api-response";
-// import { uploadFile } from "@/lib/cloudflare/r2"; // Optional: Uncomment if you want to upload results to R2
+// import { serverUploadFile } from "@/lib/cloudflare/r2"; // Optional: Uncomment if you want to upload results to R2
 import { replicate } from "@ai-sdk/replicate";
 import { ImageModel, JSONValue, experimental_generateImage as generateImage } from 'ai';
 import { z } from 'zod';
@@ -98,13 +98,13 @@ export async function POST(req: Request) {
 
     //   // Upload both images concurrently
     //   const [uploadOriginalResult, uploadGeneratedResult] = await Promise.all([
-    //     uploadFile({
+    //     serverUploadFile({
     //       data: originalImageBase64,
     //       fileName: originalFileName,
     //       contentType: originalImageType,
     //       path: path
     //     }),
-    //     uploadFile({
+    //     serverUploadFile({
     //       data: images[0].base64,
     //       fileName: generatedFileName,
     //       contentType: generatedContentType,
