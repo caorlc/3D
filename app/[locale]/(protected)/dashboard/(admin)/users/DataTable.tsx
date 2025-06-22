@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { getUsers, GetUsersResult } from "@/actions/users/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,10 +25,6 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
-import {
-  getUsers,
-  GetUsersResult,
-} from "../../../../../../actions/users/admin";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
