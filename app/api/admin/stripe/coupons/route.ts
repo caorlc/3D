@@ -10,6 +10,10 @@ export async function GET(req: NextRequest) {
     return apiResponse.forbidden("Admin privileges required.");
   }
 
+  if (!stripe) {
+    return apiResponse.serverError('Stripe is not initialized. Please check your environment variables.');
+  }
+
   try {
     let coupons: Stripe.Coupon[] = [];
     let hasMore = true;
