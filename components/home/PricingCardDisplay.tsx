@@ -42,7 +42,9 @@ export function PricingCardDisplay({
         </div>
       )}
       <h3 className="text-2xl font-bold mb-2">{cardTitle}</h3>
-      <p className="text-muted-foreground mb-6 h-[3rem]">{cardDescription}</p>
+      {cardDescription && (
+        <p className="text-muted-foreground mb-6 h-[3rem]">{cardDescription}</p>
+      )}
 
       <PricingCTA
         plan={plan}
