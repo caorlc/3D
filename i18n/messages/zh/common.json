@@ -25,6 +25,7 @@
         "href": "/#tech-stack"
       },
       {
+        "id": "pricing",
         "name": "定价",
         "href": "/#pricing"
       },
@@ -89,6 +90,7 @@
               "name": "技术栈"
             },
             {
+              "id": "pricing",
               "href": "/#pricing",
               "name": "定价"
             },

@@ -3,23 +3,11 @@ import { Newsletter } from "@/components/footer/Newsletter";
 import { TwitterX } from "@/components/social-icons/icons";
 import { siteConfig } from "@/config/site";
 import { Link as I18nLink } from "@/i18n/routing";
+import { FooterLink } from "@/types/common";
 import { GithubIcon, MailIcon } from "lucide-react";
 import { getMessages, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { SiBluesky } from "react-icons/si";
-
-type FooterLink = {
-  title: string;
-  links: Link[];
-};
-
-type Link = {
-  href: string;
-  name: string;
-  target?: string;
-  rel?: string;
-  useA?: boolean;
-};
 
 export default async function Footer() {
   const messages = await getMessages();
@@ -29,7 +17,7 @@ export default async function Footer() {
 
   const footerLinks: FooterLink[] = tFooter.raw("Links.groups");
   footerLinks.forEach((group) => {
-    const pricingLink = group.links.find((link) => link.name === "Pricing");
+    const pricingLink = group.links.find((link) => link.id === "pricing");
     if (pricingLink) {
       pricingLink.href = process.env.NEXT_PUBLIC_PRICING_PATH!;
     }

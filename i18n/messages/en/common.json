@@ -25,6 +25,7 @@
         "href": "/#tech-stack"
       },
       {
+        "id": "pricing",
         "name": "Pricing",
         "href": "/#pricing"
       },
@@ -89,6 +90,7 @@
               "name": "Tech Stack"
             },
             {
+              "id": "pricing",
               "href": "/#pricing",
               "name": "Pricing"
             },

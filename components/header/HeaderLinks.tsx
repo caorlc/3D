@@ -10,7 +10,7 @@ const HeaderLinks = () => {
   const pathname = usePathname();
 
   const headerLinks: HeaderLink[] = tHeader.raw("links");
-  const pricingLink = headerLinks.find((link) => link.name === "Pricing");
+  const pricingLink = headerLinks.find((link) => link.id === "pricing");
   if (pricingLink) {
     pricingLink.href = process.env.NEXT_PUBLIC_PRICING_PATH!;
   }
