@@ -98,7 +98,7 @@ export default function PricingCTA({ plan, localizedPlan }: Params) {
         disabled={isLoading}
         className={`w-full flex items-center justify-center gap-2 text-white py-5 font-medium ${
           plan.is_highlighted
-            ? "gradient-button"
+            ? "highlight-button"
             : "bg-gray-800 hover:bg-gray-700"
         } ${
           plan.stripe_coupon_id && plan.enable_manual_input_coupon

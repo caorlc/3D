@@ -24,7 +24,7 @@ const UseCaseCard = ({ useCase }: { useCase: UseCase }) => {
         />
         <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background p-6 shadow-sm dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
-            <div className="w-fit rounded-lg border-[0.75px] border-border p-2 gradient-bg text-white dark:text-white">
+            <div className="w-fit rounded-lg border-[0.75px] border-border p-2 highlight-bg text-white dark:text-white">
               <DynamicIcon name={useCase.icon} className="w-4 h-4" />
             </div>
             <div className="space-y-3">

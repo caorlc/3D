@@ -126,7 +126,7 @@ export default function Features() {
         </div>
 
         <div className="text-center mt-12 py-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-          <h3 className="text-xl font-semibold mb-3 gradient-text">
+          <h3 className="text-xl font-semibold mb-3 highlight-text">
             {t("moreFeatures.title")}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-5 max-w-xl mx-auto text-sm">
@@ -136,7 +136,7 @@ export default function Features() {
             href="https://nexty.dev/roadmap"
             target="_blank"
             rel="noopener noreferrer"
-            className="gradient-button inline-flex items-center"
+            className="highlight-button inline-flex items-center"
           >
             {t("moreFeatures.button")}
             <ExternalLink className="w-4 h-4 ml-2" />

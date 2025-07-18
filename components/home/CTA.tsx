@@ -31,7 +31,7 @@ export default function CTA() {
               </div>
 
               <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                <span className="gradient-text">{t("title")}</span>
+                <span className="highlight-text">{t("title")}</span>
               </h2>
 
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">

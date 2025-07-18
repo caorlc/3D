@@ -50,7 +50,7 @@ export default async function SubscriptionPage() {
         ) : (
           <>
             <p>You are currently not subscribed to any plan.</p>
-            <Button asChild className="h-11 px-6 font-medium gradient-button">
+            <Button asChild className="h-11 px-6 font-medium highlight-button">
               <I18nLink
                 href={process.env.NEXT_PUBLIC_PRICING_PATH!}
                 title="Upgrade Plan"

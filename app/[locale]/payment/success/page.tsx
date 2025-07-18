@@ -175,7 +175,7 @@ function SuccessContent() {
       >
         <Button
           variant="outline"
-          className="flex-1 gap-2 gradient-button"
+          className="flex-1 gap-2 highlight-button"
           asChild
           size="lg"
         >
