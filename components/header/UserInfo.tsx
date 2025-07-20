@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "@/i18n/routing";
+import { handleLogin } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Suspense } from "react";
@@ -28,7 +29,7 @@ interface UserInfoProps {
 }
 
 export function UserInfo({ mobile = false, renderContainer }: UserInfoProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, showLoginDialog } = useAuth();
   const router = useRouter();
 
   const t = useTranslations("Login");
@@ -40,7 +41,7 @@ export function UserInfo({ mobile = false, renderContainer }: UserInfoProps) {
   if (!user) {
     return (
       <Button
-        onClick={() => router.push("/login")}
+        onClick={() => handleLogin(router, showLoginDialog)}
         variant="outline"
         className={`highlight-bg text-white hover:text-white rounded-lg font-medium text-center hover:opacity-90 shadow-lg ${
           mobile ? "w-full" : ""

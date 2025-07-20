@@ -112,8 +112,8 @@ export default async function LocaleLayout({
           fontSans.variable
         )}
       >
-        <AuthProvider>
-          <NextIntlClientProvider messages={messages}>
+        <NextIntlClientProvider messages={messages}>
+          <AuthProvider>
             <ThemeProvider
               attribute="class"
               defaultTheme={siteConfig.defaultNextTheme}
@@ -131,8 +131,8 @@ export default async function LocaleLayout({
                 {messages.Footer && <Footer />}
               </BenefitsProvider>
             </ThemeProvider>
-          </NextIntlClientProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </NextIntlClientProvider>
         <GoogleOneTap />
         <Toaster />
         <TailwindIndicator />

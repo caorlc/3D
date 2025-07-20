@@ -1,5 +1,6 @@
 "use client";
 
+import LoginDialog from "@/components/auth/LoginDialog";
 import { normalizeEmail } from "@/lib/email";
 import { createClient } from "@/lib/supabase/client";
 import { type AuthError, type User } from "@supabase/supabase-js";
@@ -21,6 +22,11 @@ type AuthContextType = {
   ) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
+
+  // login dialog
+  showLoginDialog: () => void;
+  hideLoginDialog: () => void;
+  isLoginDialogOpen: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<ExtendedUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const next = searchParams.get("next");
@@ -159,6 +166,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await handleUser(user);
   };
 
+  const showLoginDialog = () => setIsLoginDialogOpen(true);
+  const hideLoginDialog = () => setIsLoginDialogOpen(false);
+
   return (
     <AuthContext.Provider
       value={{
@@ -169,9 +179,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithEmail,
         signOut,
         refreshUser,
+        showLoginDialog,
+        hideLoginDialog,
+        isLoginDialogOpen,
       }}
     >
       {children}
+      {process.env.NEXT_PUBLIC_LOGIN_MODE === "dialog" && (
+        <LoginDialog
+          open={isLoginDialogOpen}
+          onOpenChange={setIsLoginDialogOpen}
+        />
+      )}
     </AuthContext.Provider>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
+import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_LOCALE, useRouter } from "@/i18n/routing";
+import { handleLogin } from "@/lib/utils";
 import { PricingPlan } from "@/types/pricing";
 import { Loader2, MousePointerClick } from "lucide-react";
 import { useLocale } from "next-intl";
@@ -25,6 +27,7 @@ export default function PricingCTA({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const locale = useLocale();
+  const { showLoginDialog } = useAuth();
 
   const handleCheckout = async (applyCoupon = true) => {
     const stripePriceId = plan.stripe_price_id ?? null;
@@ -68,7 +71,7 @@ export default function PricingCTA({
 
       if (!response.ok) {
         if (response.status === 401) {
-          router.push("/login");
+          handleLogin(router, showLoginDialog);
           toast.error("You must be logged in to purchase a plan.");
           return;
         }

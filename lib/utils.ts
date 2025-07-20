@@ -1,8 +1,21 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
+}
+
+export function handleLogin(
+  router: { push: (path: string) => void },
+  showLoginDialog?: () => void
+) {
+  const loginMode = process.env.NEXT_PUBLIC_LOGIN_MODE || 'page';
+
+  if (loginMode === 'page') {
+    router.push('/login');
+  } else if (showLoginDialog) {
+    showLoginDialog();
+  }
 }
 
 export const getDomain = (url: string) => {
