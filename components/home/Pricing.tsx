@@ -52,8 +52,8 @@ export default async function Pricing() {
           plans.length === 1
             ? "grid-cols-1 max-w-sm mx-auto"
             : plans.length === 2
-            ? "grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto"
-            : "grid-cols-1 lg:grid-cols-3 max-w-3xl mx-auto"
+            ? "grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto"
+            : "grid-cols-1 lg:grid-cols-3 max-w-7xl mx-auto"
         }`}
       >
         {plans.map((plan) => {
