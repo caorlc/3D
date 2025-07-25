@@ -1,3 +1,6 @@
+-- =============================================
+-- Create Usage Table!
+-- =============================================
 -- Create the 'usage' table to store user credits balances.
 CREATE TABLE public.usage (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -54,3 +57,4 @@ CREATE POLICY "Disallow user delete usage"
 ON public.usage
 FOR DELETE
 USING (false);
+

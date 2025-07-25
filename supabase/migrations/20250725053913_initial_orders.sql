@@ -1,4 +1,6 @@
--- Create the public.orders table
+-- =============================================
+-- Create Orders Table!
+-- =============================================
 CREATE TABLE public.orders (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,

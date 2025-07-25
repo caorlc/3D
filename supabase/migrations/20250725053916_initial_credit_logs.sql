@@ -1,3 +1,6 @@
+-- =============================================
+-- Create credit_logs Table!
+-- =============================================
 -- Create the table to store credit transaction logs
 CREATE TABLE public.credit_logs (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -319,4 +322,3 @@ EXCEPTION
         RAISE WARNING 'Error in revoke_credits_and_log for user %: %', p_user_id, SQLERRM;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-

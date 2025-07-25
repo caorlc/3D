@@ -1,3 +1,6 @@
+-- =============================================
+-- Create Users Table!
+-- =============================================
 CREATE TABLE public.users (
     id uuid NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     created_at timestamptz NOT NULL DEFAULT now(),

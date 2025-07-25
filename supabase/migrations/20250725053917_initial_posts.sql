@@ -1,3 +1,6 @@
+-- =============================================
+-- Create Posts Table!
+-- =============================================
 DO $$ BEGIN
     CREATE TYPE post_status AS ENUM ('draft', 'published', 'archived');
 EXCEPTION
@@ -133,4 +136,4 @@ CREATE POLICY "Allow public read access to tags" ON public.tags
 
 -- Allow public read access to post_tags links
 CREATE POLICY "Allow public read access to post_tags" ON public.post_tags
-    FOR SELECT USING (true);
+    FOR SELECT USING (true); 

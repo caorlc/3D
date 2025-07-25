@@ -1,3 +1,6 @@
+-- =============================================
+-- Create Pricing Plans Table!
+-- =============================================
 CREATE TABLE public.pricing_plans (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
