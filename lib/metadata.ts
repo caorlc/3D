@@ -66,7 +66,7 @@ export async function constructMetadata({
       canonical: canonicalUrl ? `${siteConfig.url}${locale === DEFAULT_LOCALE ? '' : `/${locale}`}${canonicalUrl === '/' ? '' : canonicalUrl}` : undefined,
       languages: alternateLanguages,
     },
-    // Create an OG image using https://ogimage.click
+    // Create an OG image using https://myogimage.com/
     openGraph: {
       type: 'website',
       title: finalTitle,
