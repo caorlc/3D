@@ -3,13 +3,13 @@
 -- =============================================
 CREATE TABLE public.users (
     id uuid NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    created_at timestamptz NOT NULL DEFAULT now(),
-    updated_at timestamptz NOT NULL,
     email text UNIQUE NOT NULL,
     full_name text NULL,
     avatar_url text NULL,
     payment_provider text NULL,
     stripe_customer_id text UNIQUE NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    updated_at timestamptz NOT NULL,
     role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user'))
 );
 
