@@ -22,6 +22,8 @@ export default function LoginForm({
   const { signInWithGoogle, signInWithGithub, signInWithEmail } = useAuth();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGithubLoading, setIsGithubLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | undefined>();
 
   const t = useTranslations("Login");
@@ -35,7 +37,7 @@ export default function LoginForm({
       toast.success(t("Toast.Email.successTitle"), {
         description: t("Toast.Email.successDescription"),
       });
-      onSuccess?.();
+      // onSuccess?.();
     } catch (error) {
       toast.error(t("Toast.Email.errorTitle"), {
         description: t("Toast.Email.errorDescription"),
@@ -46,11 +48,13 @@ export default function LoginForm({
   };
 
   const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
     try {
       const { error } = await signInWithGoogle();
       if (error) throw error;
-      onSuccess?.();
+      // onSuccess?.();
     } catch (error) {
+      setIsGoogleLoading(false);
       toast.error(t("Toast.Google.errorTitle"), {
         description: t("Toast.Google.errorDescription"),
       });
@@ -58,11 +62,13 @@ export default function LoginForm({
   };
 
   const handleGithubLogin = async () => {
+    setIsGithubLoading(true);
     try {
       const { error } = await signInWithGithub();
       if (error) throw error;
-      onSuccess?.();
+      // onSuccess?.();
     } catch (error) {
+      setIsGithubLoading(false);
       toast.error(t("Toast.Github.errorTitle"), {
         description: t("Toast.Github.errorDescription"),
       });
@@ -72,12 +78,28 @@ export default function LoginForm({
   return (
     <div className={`grid gap-6 ${className}`}>
       <div className="grid gap-4">
-        <Button variant="outline" onClick={handleGoogleLogin}>
-          <GoogleIcon className="mr-2 h-4 w-4" />
+        <Button
+          variant="outline"
+          onClick={handleGoogleLogin}
+          disabled={isGoogleLoading || isGithubLoading}
+        >
+          {isGoogleLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <GoogleIcon className="mr-2 h-4 w-4" />
+          )}
           {t("signInMethods.signInWithGoogle")}
         </Button>
-        <Button variant="outline" onClick={handleGithubLogin}>
-          <Github className="mr-2 h-4 w-4" />
+        <Button
+          variant="outline"
+          onClick={handleGithubLogin}
+          disabled={isGoogleLoading || isGithubLoading}
+        >
+          {isGithubLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Github className="mr-2 h-4 w-4" />
+          )}
           {t("signInMethods.signInWithGithub")}
         </Button>
       </div>
