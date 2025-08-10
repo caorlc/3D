@@ -19,15 +19,18 @@ export function kebabToPascalCase(str: string): string {
 
 export function handleLogin(
   router: { push: (path: string) => void },
-  showLoginDialog?: () => void
+  showLoginDialog?: () => void,
+  currentPath?: string
 ) {
   const loginMode = process.env.NEXT_PUBLIC_LOGIN_MODE || 'page';
 
-  if (loginMode === 'page') {
-    router.push('/login');
-  } else if (showLoginDialog) {
+  if (loginMode === 'dialog' && showLoginDialog) {
     showLoginDialog();
+    return;
   }
+
+  const nextParam = currentPath ? `?next=${encodeURIComponent(currentPath)}` : '';
+  router.push(`/login${nextParam}`);
 }
 
 export const getDomain = (url: string) => {

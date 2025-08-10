@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUserBenefits } from "@/hooks/useUserBenefits";
-import { useRouter } from "@/i18n/routing";
+import { usePathname, useRouter } from "@/i18n/routing";
 import { handleLogin } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -30,6 +30,7 @@ interface UserInfoProps {
 export function UserInfo({ mobile = false, renderContainer }: UserInfoProps) {
   const { user, signOut, showLoginDialog } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const { isLoading: isBenefitsLoading } = useUserBenefits();
 
   const t = useTranslations("Login");
@@ -41,7 +42,7 @@ export function UserInfo({ mobile = false, renderContainer }: UserInfoProps) {
   if (!user) {
     return (
       <Button
-        onClick={() => handleLogin(router, showLoginDialog)}
+        onClick={() => handleLogin(router, showLoginDialog, pathname)}
         variant="outline"
         className={`highlight-button text-white hover:text-white shadow-lg ${
           mobile ? "w-full" : ""
