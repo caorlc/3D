@@ -83,12 +83,13 @@ export async function GET(req: NextRequest) {
             message: 'Subscription verified and active.',
           });
         }
-      } else if (session.mode === 'payment' && session.payment_intent) {
+      } else if (session.mode === 'payment') {
         if (session.payment_status !== 'paid') {
           return apiResponse.badRequest(`Payment status is not paid (${session.payment_status})`);
         }
 
-        const piId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent.id;
+        const piId = session.payment_intent ? typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent.id : session.id;
+
         const { data: existingOrder, error: orderCheckError } = await supabaseAdmin
           .from('orders')
           .select('id, metadata')

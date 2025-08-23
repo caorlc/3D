@@ -29,11 +29,12 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
   }
 
   if (session.mode === 'payment') {
-    const paymentIntentId = session.payment_intent as string;
+    let paymentIntentId = session.payment_intent as string;
 
     if (!paymentIntentId) {
       console.error('Payment Intent ID missing from completed checkout session (mode=payment):', session.id);
-      return;
+      // return;
+      paymentIntentId = session.id;
     }
 
     /**
