@@ -90,12 +90,17 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
 
     // --- [custom] Upgrade the user's benefits ---
     const orderId = insertedOrder?.id;
-    upgradeOneTimeCredits(userId, planId, orderId);
+    try {
+      await upgradeOneTimeCredits(userId, planId, orderId);
+    } catch (error) {
+      console.error(`CRITICAL: Failed to upgrade one-time credits for user ${userId}, order ${orderId}:`, error);
+      throw error;
+    }
     // --- End: [custom] Upgrade the user's benefits ---
   }
 }
 
-export async function upgradeOneTimeCredits(userId: string, planId: string, orderId?: string) {
+export async function upgradeOneTimeCredits(userId: string, planId: string, orderId: string) {
   // --- TODO: [custom] Upgrade the user's benefits ---
   /**
    * Complete the user's benefit upgrade based on your business logic.
@@ -124,15 +129,33 @@ export async function upgradeOneTimeCredits(userId: string, planId: string, orde
   const creditsToGrant = (planData.benefits_jsonb as any)?.one_time_credits || 0;
 
   if (creditsToGrant && creditsToGrant > 0) {
-    const { error: usageError } = await supabaseAdmin.rpc('grant_one_time_credits_and_log', {
-      p_user_id: userId,
-      p_credits_to_add: creditsToGrant,
-      p_related_order_id: orderId,
-    });
+    let attempts = 0;
+    const maxAttempts = 3;
+    let lastError: any = null;
 
-    if (usageError) {
-      console.error(`Error updating usage (one-time credits, user_id: ${userId}, creditsToGrant: ${creditsToGrant}):`, usageError);
-      throw new Error(`Failed to grant one-time credits for user ${userId}: ${usageError.message}`);
+    while (attempts < maxAttempts) {
+      attempts++;
+      const { error } = await supabaseAdmin.rpc('grant_one_time_credits_and_log', {
+        p_user_id: userId,
+        p_credits_to_add: creditsToGrant,
+        p_related_order_id: orderId,
+      });
+
+      if (!error) {
+        console.log(`Successfully granted one-time credits for user ${userId} on attempt ${attempts}.`);
+        return; // Success, exit the function
+      }
+
+      lastError = error;
+      console.warn(`Attempt ${attempts} failed for grant_one_time_credits_and_log for user ${userId}. Retrying in ${attempts}s...`, lastError.message);
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, attempts * 1000));
+      }
+    }
+
+    if (lastError) {
+      console.error(`Error updating usage (one-time credits, user_id: ${userId}, creditsToGrant: ${creditsToGrant}) after ${maxAttempts} attempts:`, lastError);
+      throw new Error(`Failed to grant one-time credits for user ${userId} after ${maxAttempts} attempts: ${lastError.message}`);
     }
   } else {
     console.log(`No one-time credits defined or amount is zero for plan ${planId}. Skipping credit grant.`);
@@ -271,7 +294,12 @@ export async function handleInvoicePaid(invoice: Stripe.Invoice) {
     if (planId && userId && subscription) {
       // --- [custom] Upgrade the user's benefits ---
       const orderId = insertedOrder?.id;
-      upgradeSubscriptionCredits(userId, planId, orderId, subscription);
+      try {
+        await upgradeSubscriptionCredits(userId, planId, orderId, subscription);
+      } catch (error) {
+        console.error(`CRITICAL: Failed to upgrade subscription credits for user ${userId}, order ${orderId}:`, error);
+        throw error;
+      }
       // --- End: [custom] Upgrade the user's benefits ---
     } else {
       console.warn(`Cannot grant subscription credits for invoice ${invoiceId} because planId (${planId}) or userId (${userId}) is unknown.`);
@@ -309,6 +337,7 @@ export async function upgradeSubscriptionCredits(userId: string, planId: string,
 
     if (planError || !planData) {
       console.error(`Error fetching plan benefits for planId ${planId} during order ${orderId} processing:`, planError);
+      throw new Error(`Could not fetch plan benefits for ${planId}: ${planError?.message}`);
     } else {
       const benefits = planData.benefits_jsonb as any;
       const recurringInterval = planData.recurring_interval;
@@ -316,32 +345,75 @@ export async function upgradeSubscriptionCredits(userId: string, planId: string,
       const creditsToGrant = benefits?.monthly_credits || 0;
 
       if (recurringInterval === 'month' && creditsToGrant) {
-        const { error: usageError } = await supabaseAdmin.rpc('grant_subscription_credits_and_log', {
-          p_user_id: userId,
-          p_credits_to_set: creditsToGrant,
-          p_related_order_id: orderId,
-        });
+        let attempts = 0;
+        const maxAttempts = 3;
+        let lastError: any = null;
 
-        if (usageError) {
-          console.error(`Error setting subscription credits for user ${userId} (order ${orderId}):`, usageError);
+        while (attempts < maxAttempts) {
+          attempts++;
+          const { error } = await supabaseAdmin.rpc('grant_subscription_credits_and_log', {
+            p_user_id: userId,
+            p_credits_to_set: creditsToGrant,
+            p_related_order_id: orderId,
+          });
+
+          if (!error) {
+            console.log(`Successfully granted subscription credits for user ${userId} on attempt ${attempts}.`);
+            lastError = null;
+            break;
+          }
+
+          lastError = error;
+          console.warn(`Attempt ${attempts} failed for grant_subscription_credits_and_log for user ${userId}. Retrying in ${attempts}s...`, lastError.message);
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, attempts * 1000));
+          }
+        }
+
+        if (lastError) {
+          throw new Error(`Failed to grant subscription credits for user ${userId} after ${maxAttempts} attempts: ${lastError.message}`);
         }
         return
       }
 
       if (recurringInterval === 'year' && benefits?.total_months && benefits?.monthly_credits) {
-        await supabaseAdmin.rpc('initialize_or_reset_yearly_allocation', {
-          p_user_id: userId,
-          p_total_months: benefits.total_months,
-          p_monthly_credits: benefits.monthly_credits,
-          p_subscription_start_date: new Date(subscription.start_date * 1000).toISOString(),
-          p_related_order_id: orderId,
-        });
+        let attempts = 0;
+        const maxAttempts = 3;
+        let lastError: any = null;
+
+        while (attempts < maxAttempts) {
+          attempts++;
+          const { error } = await supabaseAdmin.rpc('initialize_or_reset_yearly_allocation', {
+            p_user_id: userId,
+            p_total_months: benefits.total_months,
+            p_monthly_credits: benefits.monthly_credits,
+            p_subscription_start_date: new Date(subscription.start_date * 1000).toISOString(),
+            p_related_order_id: orderId,
+          });
+
+          if (!error) {
+            console.log(`Successfully initialized yearly allocation for user ${userId} on attempt ${attempts}.`);
+            lastError = null;
+            break;
+          }
+
+          lastError = error;
+          console.warn(`Attempt ${attempts} failed for initialize_or_reset_yearly_allocation for user ${userId}. Retrying in ${attempts}s...`, lastError.message);
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, attempts * 1000));
+          }
+        }
+
+        if (lastError) {
+          throw new Error(`Failed to initialize yearly allocation for user ${userId} after ${maxAttempts} attempts: ${lastError.message}`);
+        }
         return
       }
 
     }
   } catch (creditError) {
     console.error(`Error processing credits for user ${userId} (order ${orderId}):`, creditError);
+    throw creditError;
   }
   // --- End: [custom] Upgrade the user's benefits ---
 }
