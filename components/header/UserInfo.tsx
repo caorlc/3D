@@ -1,24 +1,17 @@
 "use client";
 
 import { DynamicIcon } from "@/components/DynamicIcon";
-import CurrentUserBenefitsDisplay from "@/components/layout/CurrentUserBenefitsDisplay";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
 import { user as userSchema } from "@/drizzle/db/schema";
-import { useUserBenefits } from "@/hooks/useUserBenefits";
 import { useRouter } from "@/i18n/routing";
 import { authClient } from "@/lib/auth/auth-client";
 import { ExternalLink } from "lucide-react";
 import { useTranslations } from "next-intl";
-
-const BenefitsLoadingFallback = () => (
-  <Skeleton className="h-6 w-20 rounded-md" />
-);
 
 type Menu = {
   name: string;
@@ -36,7 +29,6 @@ interface UserInfoProps {
 
 export function UserInfo({ renderContainer, user }: UserInfoProps) {
   const router = useRouter();
-  const { isLoading: isBenefitsLoading } = useUserBenefits();
 
   const t = useTranslations("Login");
 
@@ -47,7 +39,6 @@ export function UserInfo({ renderContainer, user }: UserInfoProps) {
     return null;
   }
 
-  const isStripeEnabled = process.env.NEXT_PUBLIC_ENABLE_STRIPE === "true";
   const fallbackLetter = user.email[0].toUpperCase();
 
   const signOut = async () => {
@@ -77,16 +68,6 @@ export function UserInfo({ renderContainer, user }: UserInfoProps) {
             </p>
           </div>
         </div>
-
-        {isStripeEnabled && (
-          <div className="pt-1 pb-2">
-            {isBenefitsLoading ? (
-              <BenefitsLoadingFallback />
-            ) : (
-              <CurrentUserBenefitsDisplay />
-            )}
-          </div>
-        )}
       </div>
 
       <DropdownMenuSeparator />
