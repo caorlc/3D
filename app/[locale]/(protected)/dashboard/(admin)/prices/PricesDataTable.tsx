@@ -127,10 +127,10 @@ export function PricesDataTable<TData extends PricingPlan, TValue>({
         <Button asChild className="highlight-bg text-white">
           <I18nLink
             href="/dashboard/prices/new"
-            title="Add New Plan"
+            title="Create New Plan"
             prefetch={false}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Add New Plan
+            <PlusCircle className="mr-2 h-4 w-4" /> Create New Plan
           </I18nLink>
         </Button>
       </div>
