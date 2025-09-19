@@ -12,7 +12,7 @@ import {
   user as userSchema,
 } from '@/lib/db/schema';
 import { getErrorMessage } from '@/lib/error-utils';
-import stripe from '@/lib/stripe/stripe';
+import { stripe } from '@/lib/stripe';
 import { eq, InferInsertModel } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';

@@ -4,6 +4,7 @@ import { actionResponse, ActionResult } from '@/lib/action-response';
 import { db, isDatabaseEnabled } from '@/lib/db';
 import { pricingPlans as pricingPlansSchema } from '@/lib/db/schema';
 import { getErrorMessage } from '@/lib/error-utils';
+import { isStripeEnabled } from '@/lib/stripe';
 import { and, asc, eq } from 'drizzle-orm';
 import 'server-only';
 
@@ -15,7 +16,7 @@ type PricingPlan = typeof pricingPlansSchema.$inferSelect
 export async function getPublicPricingPlans(): Promise<
   ActionResult<PricingPlan[]>
 > {
-  if (!isDatabaseEnabled) {
+  if (!isDatabaseEnabled || !isStripeEnabled) {
     return actionResponse.success([])
   }
 

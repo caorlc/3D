@@ -1,9 +1,9 @@
+import { createStripePortalSession } from "@/actions/stripe";
 import { getUserBenefits } from "@/actions/usage/benefits";
 import CurrentUserBenefitsDisplay from "@/components/layout/CurrentUserBenefitsDisplay";
 import { Button } from "@/components/ui/button";
 import { Link as I18nLink } from "@/i18n/routing";
 import { getSession } from "@/lib/auth/server";
-import { createStripePortalSession } from "@/lib/stripe/actions";
 import { redirect } from "next/navigation";
 
 export default async function SubscriptionPage() {

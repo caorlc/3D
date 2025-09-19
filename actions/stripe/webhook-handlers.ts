@@ -1,3 +1,8 @@
+import {
+  sendCreditUpgradeFailedEmail,
+  sendInvoicePaymentFailedEmail,
+  syncSubscriptionData,
+} from '@/actions/stripe';
 import { db } from '@/lib/db';
 import {
   creditLogs as creditLogsSchema,
@@ -5,12 +10,7 @@ import {
   pricingPlans as pricingPlansSchema,
   usage as usageSchema,
 } from '@/lib/db/schema';
-import {
-  sendCreditUpgradeFailedEmail,
-  sendInvoicePaymentFailedEmail,
-  syncSubscriptionData,
-} from '@/lib/stripe/actions';
-import stripe from '@/lib/stripe/stripe';
+import { stripe } from '@/lib/stripe';
 import { and, eq, inArray, InferInsertModel, sql } from 'drizzle-orm';
 import Stripe from 'stripe';
 
