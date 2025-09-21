@@ -12,6 +12,7 @@ import { deepseek } from "@ai-sdk/deepseek";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { xai } from "@ai-sdk/xai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import {
   LanguageModel,
   streamText
@@ -75,6 +76,16 @@ export async function POST(req: Request) {
           return apiResponse.serverError("Server configuration error: Missing XAI API Key.");
         }
         textModel = xai(modelId);
+        break;
+
+      case "openrouter":
+        if (!process.env.OPENROUTER_API_KEY) {
+          return apiResponse.serverError("Server configuration error: Missing OpenRouter API Key.");
+        }
+        const openrouterProvider = createOpenRouter({
+          apiKey: process.env.OPENROUTER_API_KEY,
+        });
+        textModel = openrouterProvider.chat(modelId);
         break;
 
       default:
