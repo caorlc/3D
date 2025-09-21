@@ -1,7 +1,11 @@
+import { loadEnvConfig } from '@next/env';
 import 'dotenv/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import postgres from 'postgres';
+
+const projectDir = process.cwd();
+loadEnvConfig(projectDir);
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;
