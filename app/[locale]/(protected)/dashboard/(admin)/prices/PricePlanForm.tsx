@@ -410,7 +410,6 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
     form.setValue("langJsonb", JSON.stringify(template, null, 2), {
       shouldValidate: true,
     });
-    toast.info(t("multiLanguageTemplateGenerated"));
   };
 
   const translateLangTemplate = async (
