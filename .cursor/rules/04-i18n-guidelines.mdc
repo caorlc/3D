@@ -12,8 +12,7 @@
 - For date, time, number, and currency formatting, use the locale-aware formatters:
   - `import { useFormatter } from 'next-intl'` for client components
   - `import { getFormatter } from 'next-intl/server'` for server components
-- For blog posts and other content in `content/` or `blogs/`, use filename conventions with locale suffixes (e.g., `my-post.en.md`, `my-post.ja.md`).
-- The locale system is configured in `middleware.ts` and `i18n/routing.ts`. Consult these files for locale detection and routing.
-- When adding new text, ensure translations are provided for all supported locales (currently: en, ja, zh).
+- The locale system is configured in `middleware.ts`, `i18n/routing.ts` and `i18n/request.ts`. Consult these files for locale detection and routing.
+- When adding new text, ensure translations are provided for all supported locales.
 - Pay attention to pluralization and genderization rules if applicable for the supported languages.
 - If new locales are added, ensure all necessary configuration and translation files are updated. 

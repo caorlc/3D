@@ -1,8 +1,3 @@
----
-description: 
-globs: 
-alwaysApply: false
----
 - Use functional components with Hooks. Avoid class components.
 - Component Naming: Use PascalCase (e.g., `MyComponent`). File names should match component names (e.g., `MyComponent.tsx`).
 - Props:

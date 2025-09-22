@@ -1,46 +1,52 @@
 # Project Structure Guidelines
 
-This is a Next.js project with TypeScript, Tailwind CSS, Supabase auth, and AI integration.
+This is a Next.js (App Router) project with TypeScript, Tailwind CSS, Better Auth + Drizzle (Postgres), Stripe, Cloudflare R2, next-intl, and Resend.
 Key directories and files:
 
 ## Core Directories
 - `app/`: App Router architecture with nested routes, layouts, and pages.
-  - `[locale]/`: Routes wrapped in locale context
-  - `api/`: API endpoints using Next.js Route Handlers
-  - `auth/`: Authentication routes for callbacks and verification
-- `components/`: Reusable React components organized by feature and functionality
-  - `ui/`: Shadcn UI components and base UI elements
-  - `providers/`: Context providers including AuthProvider
-  - `ai-demo/`: Components related to AI functionality
-- `lib/`: Utility functions, helpers, and configurations
-  - `supabase/`: Supabase client/server configuration
-  - `ai/`: AI model and provider configuration
-- `i18n/`: Internationalization configuration and message files
-  - `messages/`: Translation JSON files by language
-  - `routing.ts`: Locale routing configuration
-- `public/`: Static assets like images, fonts, and files
-- `styles/`: Global CSS styles and Tailwind configuration
-- `types/`: TypeScript type definitions and interfaces
-- `stores/`: Zustand state management stores
+  - `[locale]/`: Localized routes using `next-intl`
+  - `api/`: API endpoints using Route Handlers
+- `components/`: Reusable React components organized by feature
+  - `ui/`: shadcn/ui primitives
+- `lib/`: Backend utilities and integrations
+  - `auth/`: Better Auth server/client config
+  - `db/`: Drizzle ORM schema, migrations, seed
+  - `stripe/`: Stripe SDK initialization
+  - `cloudflare/`: R2 helpers
+  - `resend/`: Resend client
+  - `api-response.ts`: Consistent API response helpers
+- `i18n/`: next-intl configuration and message files
+  - `messages/`: Translation JSON by locale
+  - `routing.ts`: Locale routing definition
+- `actions/`: Server Actions for business logic (Stripe, usage, emails, blogs, etc.)
+- `emails/`: Transactional email React templates
+- `config/`: Project-level config (site, colors, models)
+- `stores/`: Zustand state stores
+- `types/`: Shared TypeScript types
+- `public/`: Static assets
+- `styles/`: Global CSS + Tailwind
 
 ## Content and Config
-- `blogs/`: Blog content with markdown files
-- `content/`: General content for the site
-- `config/`: Configuration files for various features
+- `blogs/`: MDX blog content by locale
+- `content/`: Static content (privacy policy, terms)
+- `config/`: General configuration files
 - `emails/`: Email templates for transactional emails
 
 ## Configuration Files
-- `next.config.mjs`: Next.js configuration
-- `tailwind.config.ts`: Tailwind CSS configuration
+- `next.config.mjs`: Next.js configuration (intl plugin, images, analyzer)
+- `tailwind.config.ts`: Tailwind configuration
 - `tsconfig.json`: TypeScript configuration
-- `middleware.ts`: Next.js middleware for auth and i18n routing
-- `.env.local`: Environment variables (credentials not in version control)
-- `.env.example`: Example environment variables template
+- `middleware.ts`: next-intl middleware + referral cookie
+- `drizzle.config.ts`: Drizzle migration configuration
+- `.env*`: Environment variables (never commit secrets)
 
 ## Feature Guide
-- **Authentication**: Uses Supabase Auth with Google, GitHub, and email providers.
-- **Internationalization**: Uses next-intl for translations in English, Japanese, and Chinese.
-- **AI Integration**: Multiple AI providers (OpenAI, Anthropic, Google, etc.) configured for chat and completion.
-- **UI Framework**: Uses Shadcn UI components with Tailwind CSS for styling.
-- **State Management**: Uses Zustand for global state management.
-- **Database**: Uses Supabase for PostgreSQL database access. 
+- **Authentication**: Better Auth with Drizzle adapter and Google/GitHub providers.
+- **Internationalization**: next-intl for `en`, `zh`, `ja` with cookie-based locale.
+- **AI Integration**: ai-sdk providers (OpenAI, Anthropic, Google, DeepSeek, XAI, Replicate).
+- **UI Framework**: shadcn/ui + Tailwind.
+- **State Management**: Zustand.
+- **Database**: PostgreSQL via Drizzle ORM; schema in `lib/db/schema.ts`, migrations in `lib/db/migrations`.
+- **Payments**: Stripe (conditional init via `NEXT_PUBLIC_ENABLE_STRIPE`).
+- **Storage**: Cloudflare R2 via AWS SDK S3-compatible client.

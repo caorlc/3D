@@ -1,0 +1,13 @@
+---
+description: Stripe setup and webhook handling
+globs:
+alwaysApply: false
+---
+
+- Use the singleton from `lib/stripe/index.ts`. Initialization is gated by `NEXT_PUBLIC_ENABLE_STRIPE === 'true'` and `STRIPE_SECRET_KEY`.
+- Webhooks: Implement handlers in `app/api/stripe/webhook/route.ts` and dispatch to `actions/stripe/webhook-handlers.ts`. Verify signature with `STRIPE_WEBHOOK_SECRET`.
+- When creating portal sessions or checkout, derive domain/protocol from `headers()` as in `actions/stripe/index.ts`. Fallback to `NEXT_PUBLIC_SITE_URL`.
+- Persist Stripe IDs in DB using Drizzle tables (`user.stripeCustomerId`, `subscriptions`, `orders`). Use `onConflictDoUpdate` for idempotency where relevant.
+- Store and read `metadata.userId` and `metadata.planId` to connect Stripe objects back to local entities. Fallback to DB lookups by `stripeCustomerId` if metadata is missing.
+- Email notifications (failures): Use `sendInvoicePaymentFailedEmail` and `sendCreditUpgradeFailedEmail` with Resend when `RESEND_API_KEY` and `ADMIN_EMAIL` are configured.
+- Env required: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_ENABLE_STRIPE`, `STRIPE_CUSTOMER_PORTAL_URL`.

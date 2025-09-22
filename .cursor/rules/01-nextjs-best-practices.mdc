@@ -8,6 +8,7 @@
 - Always use `next/link` for internal navigation and `next/image` for optimized image loading.
 - Be mindful of Core Web Vitals (LCP, CLS, INP). The project uses `next/core-web-vitals` ESLint config.
 - Structure API routes within the `app/api` directory using route handlers.
+- Prioritize Server Actions over Route Handlers for implementation. Manage all Server Actions centrally in the `actions` directory.
 - Leverage Server Actions for form submissions and data mutations to simplify client-side logic.
 - Use Route Handlers with proper HTTP methods (GET, POST, etc.) for API endpoints.
 - For dynamic data, utilize Next.js data fetching patterns like `fetch` with cache/revalidation options.

@@ -1,36 +1,34 @@
 ---
-description: 
-globs: 
+description: AI integration using ai-sdk (providers, routes, env)
+globs:
 alwaysApply: false
 ---
 # AI Integration Guidelines
 
-This project integrates with various AI providers for text completion, chat, and media generation capabilities.
+This project integrates multiple AI providers via `ai` and `@ai-sdk/*` packages for chat and media generation.
 
-## Model Configuration
+## Providers and Keys
 
-- AI models are configured in `lib/ai/models.ts`. When adding new models, follow the existing patterns.
-- The project supports multiple AI providers (OpenAI, Anthropic, Google, DeepSeek, XAI, Replicate).
+- Supported: OpenAI, Anthropic, Google, DeepSeek, XAI, OpenRouter, Replicate.
+- Keys must be provided via env: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, `DEEPSEEK_API_KEY`, `XAI_API_KEY`, `OPENROUTER_API_KEY`, `REPLICATE_API_TOKEN`.
+- Do not import keys client-side. All provider initialization happens in server route handlers.
 
-## Client-Side Integration
+## API Routes
 
-- For AI functionality, use the `@ai-sdk/react` hooks (`useCompletion`, `useChat`).
-- See examples in the `components/ai-demo/` directory.
+- Chat: `app/api/ai-demo/single-chat/route.ts`, `.../multi-chat/route.ts`.
+- Images/Video: `app/api/ai-demo/text-to-image/route.ts`, `image-to-image/route.ts`, `image-to-video/route.ts`.
+- Validate presence of required provider keys and return descriptive errors. Follow existing patterns in these files.
 
-## API Routes and Error Handling
+## Client Usage
 
-- AI endpoints are implemented as Route Handlers in the `app/api/` directory.
-- Use appropriate error handling for API limits, token limits, and provider outages.
-- Provider API keys are configured in environment variables.
+- Use `@ai-sdk/react` hooks (`useChat`, `useCompletion`) in UI. See `components/ai-demo/` for examples.
+- Stream responses when possible; provide cancel/stop controls in the UI.
 
-## Performance Considerations
+## Performance & Cost
 
-- Be mindful of token limits and costs when designing AI features.
-- Consider implementing caching for common AI responses where appropriate.
-- For streaming responses, use the streaming patterns provided by the AI SDK.
+- Guard production routes if necessary (`NODE_ENV === 'production'` checks already present in demos).
+- Keep token usage reasonable and consider caching for repeatable prompts.
 
-## AI Component Patterns
+## Config Surface
 
-- Separate AI logic from UI components when possible.
-- Provide appropriate loading states during AI processing.
-- Implement stopping/cancellation for long-running AI tasks.
+- Feature toggles via env: e.g., `NEXT_PUBLIC_AI_MODEL_ID`, `NEXT_PUBLIC_AI_PROVIDER` used in admin forms for visibility; do not rely on them for server-side access control.
