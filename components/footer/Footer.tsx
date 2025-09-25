@@ -6,6 +6,7 @@ import { Link as I18nLink } from "@/i18n/routing";
 import { FooterLink } from "@/types/common";
 import { GithubIcon, MailIcon } from "lucide-react";
 import { getMessages, getTranslations } from "next-intl/server";
+import Image from "next/image";
 import Link from "next/link";
 import { SiBluesky, SiDiscord } from "react-icons/si";
 
@@ -31,9 +32,15 @@ export default async function Footer() {
             <div className="w-full flex flex-col sm:flex-row lg:flex-col gap-4 col-span-full md:col-span-2">
               <div className="space-y-4 flex-1">
                 <div className="items-center space-x-2 flex">
-                  <h2 className="highlight-text text-2xl font-bold">
-                    {t("title")}
-                  </h2>
+                  <div className="text-gray-50 text-2xl font-semibold flex items-center gap-2">
+                    <Image
+                      src="/logo.png"
+                      alt={siteConfig.name}
+                      width={32}
+                      height={32}
+                    />
+                    {siteConfig.name}
+                  </div>
                 </div>
 
                 <p className="text-sm p4-4 md:pr-12">{t("tagLine")}</p>
@@ -112,9 +119,9 @@ export default async function Footer() {
 
             {footerLinks.map((section) => (
               <div key={section.title} className="flex-1">
-                <h3 className="text-white text-lg font-semibold mb-4">
+                <div className="text-white text-lg font-semibold mb-4">
                   {section.title}
-                </h3>
+                </div>
                 <ul className="space-y-2 text-sm">
                   {section.links.map((link) => (
                     <li key={link.href}>
