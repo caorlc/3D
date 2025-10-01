@@ -268,18 +268,6 @@
       "notFound": "文章未找到"
     }
   },
-  "About": {
-    "title": "关于",
-    "description": "关于网站"
-  },
-  "TermsOfService": {
-    "title": "服务条款",
-    "description": "服务条款"
-  },
-  "PrivacyPolicy": {
-    "title": "隐私政策",
-    "description": "隐私政策"
-  },
   "AIDemo": {
     "title": "AI 能力演示",
     "description": "本页面非公开功能，仅用于购买模板的用户学习和测试 AI 模型调用流程。在本地启动模板后，环境变量填写自己的 API Key 即可使用。AI Demo 包括单轮对话、多轮对话、文本转图像、图像转图像、文本/图像转视频的转换，通过 Demo 你可以快速理解 AI 调用流程，以加速你的AI应用构建之旅。",

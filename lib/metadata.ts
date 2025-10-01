@@ -9,7 +9,7 @@ type MetadataProps = {
   description?: string
   images?: string[]
   noIndex?: boolean
-  locale: Locale
+  locale?: Locale
   path?: string
   canonicalUrl?: string
 }
@@ -24,7 +24,7 @@ export async function constructMetadata({
   path,
   canonicalUrl,
 }: MetadataProps): Promise<Metadata> {
-  const t = await getTranslations({ locale, namespace: 'Home' })
+  const t = await getTranslations({ locale: locale || DEFAULT_LOCALE, namespace: 'Home' })
 
   const pageTitle = title || t(`title`)
   const pageDescription = description || t(`description`)
