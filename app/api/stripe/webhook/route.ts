@@ -3,7 +3,6 @@ import { apiResponse } from '@/lib/api-response';
 import { getErrorMessage } from '@/lib/error-utils';
 import { stripe } from '@/lib/stripe';
 import { headers } from 'next/headers';
-import { after } from 'next/server';
 import Stripe from 'stripe';
 
 const relevantEvents = new Set([
@@ -15,8 +14,6 @@ const relevantEvents = new Set([
   'invoice.payment_failed',
   'charge.refunded'
 ]);
-
-const useAsyncProcessing = process.env.STRIPE_WEBHOOK_ASYNC_PROCESSING === 'true';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -43,24 +40,13 @@ export async function POST(req: Request) {
   }
 
   if (relevantEvents.has(event.type)) {
-    if (useAsyncProcessing) {
-      after(() => {
-        try {
-          processWebhookEvent(event);
-        } catch (error) {
-          console.error(`Error processing webhook ${event.type} in background:`, error);
-        }
-      });
+    try {
+      await processWebhookEvent(event);
       return apiResponse.success({ received: true });
-    } else {
-      try {
-        await processWebhookEvent(event);
-        return apiResponse.success({ received: true });
-      } catch (error) {
-        console.error(`Error during sync processing for webhook ${event.type}:`, error);
-        const errorMessage = getErrorMessage(error);
-        return apiResponse.serverError(`Webhook handler failed during sync processing. Error: ${errorMessage}`);
-      }
+    } catch (error) {
+      console.error(`Error during sync processing for webhook ${event.type}:`, error);
+      const errorMessage = getErrorMessage(error);
+      return apiResponse.serverError(`Webhook handler failed during sync processing. Error: ${errorMessage}`);
     }
   } else {
     return apiResponse.success({ received: true });
