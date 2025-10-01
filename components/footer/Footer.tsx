@@ -170,6 +170,14 @@ export default async function Footer() {
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <I18nLink
+                href="/about"
+                title={tFooter("About")}
+                prefetch={false}
+                className="text-gray-400 hover:text-white text-sm"
+              >
+                {tFooter("About")}
+              </I18nLink>
+              <I18nLink
                 href="/privacy-policy"
                 title={tFooter("PrivacyPolicy")}
                 prefetch={false}
