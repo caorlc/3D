@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
 import { pricingPlans as pricingPlansSchema } from '@/lib/db/schema';
 import { getErrorMessage } from '@/lib/error-utils';
 import { stripe } from '@/lib/stripe';
-import { getURL } from '@/lib/utils';
+import { getURL } from '@/lib/url';
 import { eq } from 'drizzle-orm';
 import type { Stripe } from 'stripe';
 

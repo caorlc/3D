@@ -5,15 +5,9 @@
  * https://sdk.vercel.ai/providers/ai-sdk-providers
  */
 
+import { createAIModel } from "@/lib/ai-model-factory";
 import { apiResponse } from "@/lib/api-response";
-import { anthropic } from "@ai-sdk/anthropic";
-import { deepseek } from "@ai-sdk/deepseek";
-import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
-import { xai } from "@ai-sdk/xai";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import {
-  LanguageModel,
   streamText
 } from "ai";
 import { z } from 'zod';
@@ -39,60 +33,18 @@ export async function POST(req: Request) {
 
     const { prompt, modelId, provider } = validationResult.data;
 
-    let textModel: LanguageModel;
 
-    switch (provider) {
-      case "openai":
-        if (!process.env.OPENAI_API_KEY) {
-          return apiResponse.serverError("Server configuration error: Missing OpenAI API Key.");
-        }
-        textModel = openai(modelId);
-        break;
-
-      case "anthropic":
-        if (!process.env.ANTHROPIC_API_KEY) {
-          return apiResponse.serverError("Server configuration error: Missing Anthropic API Key.");
-        }
-        textModel = anthropic(modelId);
-        break;
-
-      case "google":
-        if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-          return apiResponse.serverError("Server configuration error: Missing Google API Key.");
-        }
-        textModel = google(modelId);
-        break;
-
-      case "deepseek":
-        if (!process.env.DEEPSEEK_API_KEY) {
-          return apiResponse.serverError("Server configuration error: Missing DeepSeek API Key.");
-        }
-        textModel = deepseek(modelId);
-        break;
-
-      case "xai":
-        if (!process.env.XAI_API_KEY) {
-          return apiResponse.serverError("Server configuration error: Missing XAI API Key.");
-        }
-        textModel = xai(modelId);
-        break;
-
-      case "openrouter":
-        if (!process.env.OPENROUTER_API_KEY) {
-          return apiResponse.serverError("Server configuration error: Missing OpenRouter API Key.");
-        }
-        const openrouterProvider = createOpenRouter({
-          apiKey: process.env.OPENROUTER_API_KEY,
-        });
-        textModel = openrouterProvider.chat(modelId);
-        break;
-
-      default:
-        return apiResponse.badRequest("Invalid provider");
+    let model;
+    try {
+      model = createAIModel(provider, modelId);
+    } catch (error) {
+      console.error("Failed to create AI model:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      return apiResponse.serverError(message);
     }
 
     const result = await streamText({
-      model: textModel,
+      model: model,
       prompt: prompt,
       // debug
       // onChunk: async (chunk) => {
