@@ -65,6 +65,7 @@ export async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Se
       userId: userId,
       provider: 'stripe',
       providerOrderId: paymentIntentId,
+      stripePaymentIntentId: paymentIntentId,
       status: 'succeeded',
       orderType: 'one_time_purchase',
       planId: planId,
@@ -126,7 +127,6 @@ export async function upgradeOneTimeCredits(userId: string, planId: string, orde
     .where(eq(pricingPlansSchema.id, planId))
     .limit(1);
   const planData = planDataResults[0];
-
 
   if (!planData) {
     throw new Error(`Could not fetch plan benefits for ${planId}`);
@@ -286,12 +286,17 @@ export async function handleInvoicePaid(invoice: Stripe.Invoice) {
       console.warn(`Could not determine planId for subscription ${subscriptionId} from invoice ${invoiceId}. Order created, but credit grant may fail.`);
     }
 
+    const invoiceData = await stripe!.invoices.retrieve(invoice.id as string, { expand: ['payments'] });
+    const paymentIntentId = invoiceData.payments?.data[0]?.payment.payment_intent as string | null;
+
     const orderType = invoice.billing_reason === 'subscription_create' ? 'subscription_initial' : 'subscription_renewal';
     const orderData: InferInsertModel<typeof ordersSchema> = {
       userId: userId,
       provider: 'stripe',
       providerOrderId: invoiceId,
-      subscriptionProviderId: subscriptionId,
+      stripePaymentIntentId: paymentIntentId,
+      stripeInvoiceId: invoiceId,
+      subscriptionId: subscriptionId,
       status: 'succeeded',
       orderType: orderType,
       planId: planId,
@@ -534,8 +539,6 @@ export async function upgradeSubscriptionCredits(userId: string, planId: string,
  */
 export async function handleSubscriptionUpdate(subscription: Stripe.Subscription, isDeleted: boolean = false) {
   const customerId = typeof subscription.customer === 'string' ? subscription.customer : null;
-  const userId = subscription.metadata?.userId;
-  const planId = subscription.metadata?.planId;
 
   if (!customerId) {
     console.error(`Customer ID missing on subscription object: ${subscription.id}. Cannot sync.`);
@@ -545,9 +548,9 @@ export async function handleSubscriptionUpdate(subscription: Stripe.Subscription
   try {
     await syncSubscriptionData(subscription.id, customerId, subscription.metadata);
 
-    if (isDeleted && userId && planId) {
-      // --- [custom] Revoke the user's benefits (only for one time purchase) ---
-      revokeSubscriptionCredits(userId, planId, subscription.id);
+    if (isDeleted) {
+      // --- [custom] Revoke the user's benefits---
+      revokeRemainingSubscriptionCreditsOnEnd(subscription);
       // --- End: [custom] Revoke the user's benefits ---
     }
   } catch (error) {
@@ -556,104 +559,61 @@ export async function handleSubscriptionUpdate(subscription: Stripe.Subscription
   }
 }
 
-export async function revokeSubscriptionCredits(userId: string, planId: string, subscriptionId: string) {
-  // --- TODO: [custom] Revoke the user's subscription benefits ---
-  /**
-   * Complete the user's subscription benefit revocation based on your business logic.
-   * This function is triggered when a subscription is canceled ('customer.subscription.deleted').
-   * 
-   * 根据你的业务逻辑，取消用户的订阅权益。
-   * 此函数在订阅被取消时 ('customer.subscription.deleted') 触发。
-   *
-   * お客様のビジネスロジックに基づいて、ユーザーのサブスクリプション特典を取消してください。
-   * この関数は、サブスクリプションがキャンセルされたとき ('customer.subscription.deleted') にトリガーされます。
-   */
-  try {
-    const planDataResults = await db
-      .select({ recurringInterval: pricingPlansSchema.recurringInterval })
-      .from(pricingPlansSchema)
-      .where(eq(pricingPlansSchema.id, planId))
-      .limit(1);
-    const planData = planDataResults[0];
+export async function revokeRemainingSubscriptionCreditsOnEnd(subscription: Stripe.Subscription) {
+  const customerId = typeof subscription.customer === 'string' ? subscription.customer : null;
 
-    if (!planData) {
-      console.error(`Error fetching plan benefits for planId ${planId} during subscription ${subscriptionId} cancellation`);
-      return;
+  if (!customerId) {
+    console.error(`Customer ID missing on subscription object: ${subscription.id}. Cannot revoke.`);
+    return;
+  }
+
+  if (!stripe) {
+    console.error('Stripe is not initialized. Please check your environment variables.');
+    return;
+  }
+
+  let userId = subscription.metadata?.userId as string | undefined;
+
+  if (!userId) {
+    try {
+      const customer = await stripe.customers.retrieve(customerId);
+      if (!(customer as Stripe.DeletedCustomer).deleted) {
+        userId = (customer as Stripe.Customer).metadata?.userId ?? undefined;
+      }
+    } catch (err) {
+      console.error(`Error retrieving customer ${customerId} for subscription ${subscription.id}:`, err);
     }
+  }
 
-    let subscriptionToRevoke = 0;
-    const recurringInterval = planData.recurringInterval;
-    let clearYearly = false;
-    let clearMonthly = false;
+  if (!userId) {
+    console.error(`Could not determine userId for subscription ${subscription.id} end event.`);
+    return;
+  }
 
-    const usageDataResults = await db
-      .select({ balanceJsonb: usageSchema.balanceJsonb })
+  try {
+    const usageRows = await db
+      .select({ subBalance: usageSchema.subscriptionCreditsBalance })
       .from(usageSchema)
       .where(eq(usageSchema.userId, userId))
       .limit(1);
-    const usageData = usageDataResults[0];
+    const amountToRevoke = usageRows[0]?.subBalance ?? 0;
 
-    if (!usageData) {
-      console.error(`Error fetching usage data for user ${userId}`);
-      return;
+    if (amountToRevoke > 0) {
+      await applySubscriptionCreditsRevocation({
+        userId,
+        amountToRevoke,
+        clearMonthly: true,
+        clearYearly: true,
+        logType: 'subscription_ended_revoke',
+        notes: `Subscription ${subscription.id} ended; remaining credits revoked.`,
+        relatedOrderId: null,
+      });
     }
 
-    if (recurringInterval === 'year') {
-      const yearlyDetails = (usageData.balanceJsonb as any)?.yearlyAllocationDetails;
-      subscriptionToRevoke = yearlyDetails?.monthlyCredits
-      clearYearly = true;
-    } else if (recurringInterval === 'month') {
-      const monthlyDetails = (usageData.balanceJsonb as any)?.monthlyAllocationDetails;
-      subscriptionToRevoke = monthlyDetails?.monthlyCredits
-      clearMonthly = true;
-    }
-
-    if (subscriptionToRevoke) {
-      try {
-        await db.transaction(async (tx) => {
-          const usageResults = await tx.select().from(usageSchema).where(eq(usageSchema.userId, userId)).for('update');
-          const usage = usageResults[0];
-
-          if (!usage) { return; }
-
-          const newSubBalance = Math.max(0, usage.subscriptionCreditsBalance - subscriptionToRevoke);
-          const amountRevoked = usage.subscriptionCreditsBalance - newSubBalance;
-          let newBalanceJsonb = usage.balanceJsonb as any;
-          if (clearYearly) {
-            delete newBalanceJsonb?.yearlyAllocationDetails;
-          }
-          if (clearMonthly) {
-            delete newBalanceJsonb?.monthlyAllocationDetails;
-          }
-
-          if (amountRevoked > 0) {
-            await tx.update(usageSchema)
-              .set({
-                subscriptionCreditsBalance: newSubBalance,
-                balanceJsonb: newBalanceJsonb,
-              })
-              .where(eq(usageSchema.userId, userId));
-
-            await tx.insert(creditLogsSchema).values({
-              userId: userId,
-              amount: -amountRevoked,
-              oneTimeBalanceAfter: usage.oneTimeCreditsBalance,
-              subscriptionBalanceAfter: newSubBalance,
-              type: 'subscription_cancel_revoke',
-              notes: `Subscription ${subscriptionId} cancelled/ended.`,
-              relatedOrderId: null,
-            });
-          }
-        });
-        console.log(`Successfully revoked subscription credits for user ${userId} related to subscription ${subscriptionId} cancellation.`);
-      } catch (revokeError) {
-        console.error(`Error calling revoke credits and log (subscription) for user ${userId}, subscription ${subscriptionId}:`, revokeError);
-      }
-    }
+    console.log(`Revoked remaining subscription credits on end for subscription ${subscription.id}, user ${userId}`);
   } catch (error) {
-    console.error(`Error during revokeSubscriptionCredits for user ${userId}, subscription ${subscriptionId}:`, error);
+    console.error(`Error revoking remaining credits for subscription ${subscription.id}:`, error);
   }
-  // --- End: [custom] Revoke the user's subscription benefits ---
 }
 
 /**
@@ -706,11 +666,11 @@ export async function handleRefund(charge: Stripe.Charge) {
     return;
   }
 
-  const refundId = charge.id;
+  const chargeId = charge.id;
   const paymentIntentId = charge.payment_intent as string | null;
   const customerId = typeof charge.customer === 'string' ? charge.customer : null;
 
-  if (!refundId || !paymentIntentId) {
+  if (!chargeId || !paymentIntentId) {
     console.error(`Refund ID missing from refunded charge: ${charge.id}. Cannot process refund fully.`);
     return;
   }
@@ -724,12 +684,13 @@ export async function handleRefund(charge: Stripe.Charge) {
     .from(ordersSchema)
     .where(and(
       eq(ordersSchema.provider, 'stripe'),
-      eq(ordersSchema.providerOrderId, refundId),
+      eq(ordersSchema.providerOrderId, chargeId),
       eq(ordersSchema.orderType, 'refund')
     ))
     .limit(1);
 
   if (existingRefundOrderResults.length > 0) {
+    // already refunded
     return;
   }
 
@@ -738,15 +699,23 @@ export async function handleRefund(charge: Stripe.Charge) {
     .from(ordersSchema)
     .where(and(
       eq(ordersSchema.provider, 'stripe'),
-      eq(ordersSchema.providerOrderId, paymentIntentId),
+      eq(ordersSchema.stripePaymentIntentId, paymentIntentId),
       inArray(ordersSchema.orderType, ['one_time_purchase', 'subscription_initial', 'subscription_renewal'])
     ))
     .limit(1);
   const originalOrder = originalOrderResults[0];
 
   if (!originalOrder) {
-    // The invoice.paid event triggered by a subscription is recorded with invoice_id, not payment_intentId, so the revoke credits logic for the subscription will not be triggered in handleRefund.
-    console.warn(`Original order for payment intent ${paymentIntentId} not found. Subscription will not be revoked.`);
+    console.error(`Original order for payment intent ${paymentIntentId} not found.`);
+    return;
+  } else {
+    const isFullRefund =
+      Math.abs(charge.amount_refunded) === Math.round(parseFloat(originalOrder.amountTotal!) * 100);
+
+    await db
+      .update(ordersSchema)
+      .set({ status: isFullRefund ? 'refunded' : 'partially_refunded' })
+      .where(eq(ordersSchema.id, originalOrder.id));
   }
 
   if (!stripe) {
@@ -767,12 +736,14 @@ export async function handleRefund(charge: Stripe.Charge) {
 
   const refundAmount = charge.amount_refunded / 100;
   const refundData: InferInsertModel<typeof ordersSchema> = {
-    userId: originalOrder?.userId ?? userId,
+    userId: originalOrder.userId ?? userId,
     provider: 'stripe',
-    providerOrderId: refundId,
+    providerOrderId: chargeId,
+    stripePaymentIntentId: paymentIntentId,
+    stripeChargeId: chargeId,
     status: 'succeeded',
     orderType: 'refund',
-    planId: originalOrder?.planId ?? null,
+    planId: originalOrder.planId ?? null,
     priceId: null,
     productId: null,
     amountSubtotal: null,
@@ -780,9 +751,8 @@ export async function handleRefund(charge: Stripe.Charge) {
     amountTax: null,
     amountTotal: (-refundAmount).toString(),
     currency: charge.currency,
-    subscriptionProviderId: null,
+    subscriptionId: null,
     metadata: {
-      stripeRefundId: refundId,
       stripeChargeId: charge.id,
       stripePaymentIntentId: paymentIntentId,
       originalOrderId: originalOrder?.id ?? null,
@@ -798,11 +768,13 @@ export async function handleRefund(charge: Stripe.Charge) {
   const refundOrder = refundOrderResults[0];
 
   if (!refundOrder) {
-    throw new Error(`Error inserting refund order for refund ${refundId}`);
+    throw new Error(`Error inserting refund order for refund ${chargeId}`);
   }
 
-  // --- [custom] Revoke the user's benefits (only for one time purchase) ---
-  if (originalOrder) {
+  // --- [custom] Revoke the user's benefits  ---
+  if (originalOrder.subscriptionId) {
+    revokeSubscriptionCredits(charge, originalOrder);
+  } else {
     revokeOneTimeCredits(charge, originalOrder, refundOrder.id);
   }
   // --- End: [custom] Revoke the user's benefits ---
@@ -823,73 +795,200 @@ export async function revokeOneTimeCredits(charge: Stripe.Charge, originalOrder:
    * 特典は、料金プランの `benefitsJsonb` フィールド（ダッシュボードの /dashboard/prices でアクセス可能）で定義することをお勧めします。このコードは、定義された特典に基づいて、ユーザーの特典を取消します。
    * 以下のコードは、`oneTimeCredits` を使用した例です。他の特典を取消する必要がある場合は、お客様のビジネスロジックに従って、以下のコードを修正してください。
    */
-  if (originalOrder && originalOrder.userId && originalOrder.planId) {
-    const isFullRefund = Math.abs(charge.amount_refunded) === Math.round(parseFloat(originalOrder.amountTotal!) * 100);
+  const planId = originalOrder.planId as string;
+  const userId = originalOrder.userId as string;
 
-    if (isFullRefund) {
-      const planDataResults = await db
-        .select({ benefitsJsonb: pricingPlansSchema.benefitsJsonb })
-        .from(pricingPlansSchema)
-        .where(eq(pricingPlansSchema.id, originalOrder.planId))
-        .limit(1);
-      const planData = planDataResults[0];
+  const isFullRefund = Math.abs(charge.amount_refunded) === Math.round(parseFloat(originalOrder.amountTotal!) * 100);
 
-      if (!planData) {
-        console.error(`Error fetching plan benefits for planId ${originalOrder.planId} during refund ${refundOrderId}:`);
-      } else {
-        let oneTimeToRevoke = 0;
-        const benefits = planData.benefitsJsonb as any;
+  if (isFullRefund) {
+    const planDataResults = await db
+      .select({ benefitsJsonb: pricingPlansSchema.benefitsJsonb })
+      .from(pricingPlansSchema)
+      .where(eq(pricingPlansSchema.id, planId))
+      .limit(1);
+    const planData = planDataResults[0];
 
-        if (benefits?.oneTimeCredits > 0) {
-          oneTimeToRevoke = benefits.oneTimeCredits;
-        }
-
-        if (oneTimeToRevoke > 0) {
-          try {
-            await db.transaction(async (tx) => {
-              const usageResults = await tx.select().from(usageSchema).where(eq(usageSchema.userId, originalOrder.userId)).for('update');
-              const usage = usageResults[0];
-
-              if (!usage) { return; }
-
-              const newOneTimeBalance = Math.max(0, usage.oneTimeCreditsBalance - oneTimeToRevoke);
-              const amountRevoked = usage.oneTimeCreditsBalance - newOneTimeBalance;
-
-              if (amountRevoked > 0) {
-                await tx.update(usageSchema)
-                  .set({ oneTimeCreditsBalance: newOneTimeBalance })
-                  .where(eq(usageSchema.userId, originalOrder.userId));
-
-                await tx.insert(creditLogsSchema).values({
-                  userId: originalOrder.userId,
-                  amount: -amountRevoked,
-                  oneTimeBalanceAfter: newOneTimeBalance,
-                  subscriptionBalanceAfter: usage.subscriptionCreditsBalance,
-                  type: 'refund_revoke',
-                  notes: `Full refund for order ${originalOrder.id}.`,
-                  relatedOrderId: refundOrderId,
-                });
-              }
-            });
-            console.log(`Successfully revoked credits for user ${originalOrder.userId} related to refund ${refundOrderId}.`);
-          } catch (revokeError) {
-            console.error(`Error calling revoke credits and log for user ${originalOrder.userId}, refund ${refundOrderId}:`, revokeError);
-          }
-        } else {
-          console.log(`No credits defined to revoke for plan ${originalOrder.planId}, order type ${originalOrder.orderType} on refund ${refundOrderId}.`);
-        }
-      }
+    if (!planData) {
+      console.error(`Error fetching plan benefits for planId ${planId} during refund ${refundOrderId}:`);
     } else {
-      console.log(`Refund ${charge.id} is not a full refund. Skipping credit revocation. Refunded: ${charge.amount_refunded}, Original Total: ${parseFloat(originalOrder.amountTotal!) * 100}`);
+      let oneTimeToRevoke = 0;
+      const benefits = planData.benefitsJsonb as any;
+
+      if (benefits?.oneTimeCredits > 0) {
+        oneTimeToRevoke = benefits.oneTimeCredits;
+      }
+
+      if (oneTimeToRevoke > 0) {
+        try {
+          await db.transaction(async (tx) => {
+            const usageResults = await tx.select().from(usageSchema).where(eq(usageSchema.userId, userId)).for('update');
+            const usage = usageResults[0];
+
+            if (!usage) { return; }
+
+            const newOneTimeBalance = Math.max(0, usage.oneTimeCreditsBalance - oneTimeToRevoke);
+            const amountRevoked = usage.oneTimeCreditsBalance - newOneTimeBalance;
+
+            if (amountRevoked > 0) {
+              await tx.update(usageSchema)
+                .set({ oneTimeCreditsBalance: newOneTimeBalance })
+                .where(eq(usageSchema.userId, userId));
+
+              await tx.insert(creditLogsSchema).values({
+                userId,
+                amount: -amountRevoked,
+                oneTimeBalanceAfter: newOneTimeBalance,
+                subscriptionBalanceAfter: usage.subscriptionCreditsBalance,
+                type: 'refund_revoke',
+                notes: `Full refund for order ${originalOrder.id}.`,
+                relatedOrderId: originalOrder.id,
+              });
+            }
+          });
+          console.log(`Successfully revoked credits for user ${userId} related to refund ${refundOrderId}.`);
+        } catch (revokeError) {
+          console.error(`Error calling revoke credits and log for user ${userId}, refund ${refundOrderId}:`, revokeError);
+        }
+      } else {
+        console.log(`No credits defined to revoke for plan ${planId}, order type ${originalOrder.orderType} on refund ${refundOrderId}.`);
+      }
     }
   } else {
-    if (!originalOrder) {
-      console.warn(`Cannot revoke one-time credits for refund ${refundOrderId} because original order was not found.`);
-    } else if (originalOrder.orderType !== 'one_time_purchase') {
-      console.log(`Skipping one-time credit revocation for refund ${refundOrderId} as original order type is ${originalOrder.orderType}.`);
-    } else {
-      console.warn(`Cannot revoke one-time credits for refund ${refundOrderId} due to missing userId or planId on original order ${originalOrder.id}.`);
-    }
+    console.log(`Refund ${charge.id} is not a full refund. Skipping credit revocation. Refunded: ${charge.amount_refunded}, Original Total: ${parseFloat(originalOrder.amountTotal!) * 100}`);
   }
   // --- End: [custom] Revoke the user's one time purchase benefits ---
+}
+
+export async function revokeSubscriptionCredits(charge: Stripe.Charge, originalOrder: Order) {
+  // --- TODO: [custom] Revoke the user's subscription benefits ---
+  /**
+   * Complete the user's subscription benefit revocation based on your business logic.
+   * 
+   * 根据你的业务逻辑，取消用户的订阅权益。
+   * 
+   * お客様のビジネスロジックに基づいて、ユーザーのサブスクリプション特典を取消してください。
+   */
+  const planId = originalOrder.planId as string;
+  const userId = originalOrder.userId as string;
+  const subscriptionId = originalOrder.subscriptionId as string;
+
+  try {
+    const ctx = await getSubscriptionRevokeContext(planId, userId);
+    if (!ctx) { return; }
+
+    if (ctx.subscriptionToRevoke > 0) {
+      await applySubscriptionCreditsRevocation({
+        userId,
+        amountToRevoke: ctx.subscriptionToRevoke,
+        clearMonthly: ctx.clearMonthly,
+        clearYearly: ctx.clearYearly,
+        logType: 'refund_revoke',
+        notes: `Full refund for subscription order ${originalOrder.id}.`,
+        relatedOrderId: originalOrder.id,
+      });
+      console.log(`Successfully revoked subscription credits for user ${userId} related to subscription ${subscriptionId} refund.`);
+    }
+  } catch (error) {
+    console.error(`Error during revokeSubscriptionCredits for user ${userId}, subscription ${subscriptionId}:`, error);
+  }
+  // --- End: [custom] Revoke the user's subscription benefits ---
+}
+
+async function getSubscriptionRevokeContext(planId: string, userId: string) {
+  const planDataResults = await db
+    .select({ recurringInterval: pricingPlansSchema.recurringInterval })
+    .from(pricingPlansSchema)
+    .where(eq(pricingPlansSchema.id, planId))
+    .limit(1);
+  const planData = planDataResults[0];
+
+  if (!planData) {
+    console.error(`Error fetching plan benefits for planId ${planId} while computing revoke context`);
+    return null;
+  }
+
+  const usageDataResults = await db
+    .select({ balanceJsonb: usageSchema.balanceJsonb })
+    .from(usageSchema)
+    .where(eq(usageSchema.userId, userId))
+    .limit(1);
+  const usageData = usageDataResults[0];
+
+  if (!usageData) {
+    console.error(`Error fetching usage data for user ${userId} while computing revoke context`);
+    return { recurringInterval: planData.recurringInterval, subscriptionToRevoke: 0, clearMonthly: false, clearYearly: false };
+  }
+
+  let subscriptionToRevoke = 0;
+  let clearYearly = false;
+  let clearMonthly = false;
+
+  if (planData.recurringInterval === 'year') {
+    const yearlyDetails = (usageData.balanceJsonb as any)?.yearlyAllocationDetails;
+    subscriptionToRevoke = yearlyDetails?.monthlyCredits || 0;
+    clearYearly = true;
+  } else if (planData.recurringInterval === 'month') {
+    const monthlyDetails = (usageData.balanceJsonb as any)?.monthlyAllocationDetails;
+    subscriptionToRevoke = monthlyDetails?.monthlyCredits || 0;
+    clearMonthly = true;
+  }
+
+  return {
+    recurringInterval: planData.recurringInterval,
+    subscriptionToRevoke,
+    clearMonthly,
+    clearYearly,
+  };
+}
+
+async function applySubscriptionCreditsRevocation(params: {
+  userId: string;
+  amountToRevoke: number;
+  clearMonthly?: boolean;
+  clearYearly?: boolean;
+  logType: string;
+  notes: string;
+  relatedOrderId?: string | null;
+}) {
+  const { userId, amountToRevoke, clearMonthly, clearYearly, logType, notes, relatedOrderId } = params;
+
+  if (!amountToRevoke || amountToRevoke <= 0) {
+    return;
+  }
+
+  await db.transaction(async (tx) => {
+    const usageResults = await tx.select().from(usageSchema).where(eq(usageSchema.userId, userId)).for('update');
+    const usage = usageResults[0];
+    if (!usage) { return; }
+
+    const newSubBalance = Math.max(0, usage.subscriptionCreditsBalance - amountToRevoke);
+    const amountRevoked = usage.subscriptionCreditsBalance - newSubBalance;
+
+    let newBalanceJsonb = usage.balanceJsonb as any;
+    if (clearYearly) {
+      delete newBalanceJsonb?.yearlyAllocationDetails;
+    }
+    if (clearMonthly) {
+      delete newBalanceJsonb?.monthlyAllocationDetails;
+    }
+
+    if (amountRevoked > 0) {
+      await tx.update(usageSchema)
+        .set({
+          subscriptionCreditsBalance: newSubBalance,
+          balanceJsonb: newBalanceJsonb,
+        })
+        .where(eq(usageSchema.userId, userId));
+
+      await tx.insert(creditLogsSchema).values({
+        userId,
+        amount: -amountRevoked,
+        oneTimeBalanceAfter: usage.oneTimeCreditsBalance,
+        subscriptionBalanceAfter: newSubBalance,
+        type: logType,
+        notes,
+        relatedOrderId: relatedOrderId ?? null,
+      });
+    }
+  });
 }

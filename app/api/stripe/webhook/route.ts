@@ -12,7 +12,7 @@ const relevantEvents = new Set([
   'customer.subscription.deleted',
   'invoice.paid',
   'invoice.payment_failed',
-  'charge.refunded'
+  'charge.refunded',
 ]);
 
 export async function POST(req: Request) {
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 }
 
 async function processWebhookEvent(event: Stripe.Event) {
-  // console.log('debug event', event.type, JSON.stringify(event.data.object));
+  console.log('debug event', event.type);
 
   switch (event.type) {
     case 'checkout.session.completed':
