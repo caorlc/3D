@@ -29,10 +29,10 @@ const formatLogType = (type: string, t: (key: string) => string) => {
       return <Badge variant="secondary">{t("type_feature_usage")}</Badge>;
     case "refund_revoke":
       return <Badge variant="destructive">{t("type_refund_revoke")}</Badge>;
-    case "subscription_cancel_revoke":
+    case "subscription_ended_revoke":
       return (
         <Badge variant="destructive">
-          {t("type_subscription_cancel_revoke")}
+          {t("type_subscription_ended_revoke")}
         </Badge>
       );
     case "welcome_bonus":
