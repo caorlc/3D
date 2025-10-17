@@ -4,25 +4,45 @@ globs:
 alwaysApply: false
 ---
 
-- Use helpers in `lib/cloudflare/r2.ts`:
-  - `serverUploadFile({ data, contentType, path?, key })` — uploads and returns `{ url, key }`.
-  - `deleteFile(key)` — deletes by key.
-  - `listR2Objects({ prefix?, continuationToken?, pageSize? })` — paginated listing.
-  - `generateR2Key({ fileName, path?, prefix? })` — generates unique keys.
-- Required env: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`.
-- Do not use client-side SDK for uploads. Route all uploads through server actions or route handlers.
-- Validate input file type/size when accepting uploads (see avatar constraints in `lib/validations.ts`).
-- Ensure `next.config.mjs` `images.remotePatterns` includes `R2_PUBLIC_URL` hostname (already configured).
+Core Libraries:
+
+`lib/cloudflare/r2-client.ts`:
+- `createR2Client()` — Creates and returns S3Client configured for Cloudflare R2.
+
+`lib/cloudflare/r2-utils.ts`:
+- `generateR2Key({ fileName, path?, prefix? })` — Generates unique keys with timestamp and random string. Returns formatted key with optional path and prefix.
+
+`lib/cloudflare/r2.ts`:
+- `serverUploadFile({ data, contentType, path?, key })` — Uploads file (Buffer or base64 string) and returns `{ url, key }`.
+- `deleteFile(key)` — Deletes file by key.
+- `listR2Objects({ prefix?, continuationToken?, pageSize? })` — Paginated listing, returns `{ objects: ListedObject[], nextContinuationToken?, error? }`.
+- `createPresignedUploadUrl({ key, contentType, expiresIn? })` — Generates presigned PUT URL for client-side uploads. Returns `{ presignedUrl, publicObjectUrl }`.
+- `createPresignedDownloadUrl({ key, expiresIn? })` — Generates presigned GET URL for temporary download access.
+
+Required env: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL`.
 
 Server Actions (`actions/r2-resources/index.ts`):
-- Listing: use `listR2Files({ categoryPrefix, filterPrefix?, continuationToken?, pageSize? })` which wraps `listR2Objects` and returns files plus `nextContinuationToken` via `actionResponse`.
-- Deleting: use `deleteR2File({ key })` which sanitizes the key and calls `deleteFile`.
-- Presigned uploads: prefer `generateAdminPresignedUploadUrl` for admins and `generateUserPresignedUploadUrl` for authenticated users; both delegate to `generatePresignedUploadUrl` which generates a key with `generateR2Key` and returns `{ presignedUrl, key, publicObjectUrl }`.
-- AuthN/AuthZ: `isAdmin()` is required for admin endpoints; `getSession()` is used for user endpoints. Never trust client-provided user IDs.
-- Validation: all inputs must go through zod schemas in the action file; return `actionResponse.badRequest` on validation errors.
+- `listR2Files({ categoryPrefix, filterPrefix?, continuationToken?, pageSize? })` — Admin-only. Lists files with optional filtering. Returns `{ files, nextContinuationToken }` via `actionResponse`.
+- `deleteR2File(key)` — Admin-only. Sanitizes key and calls `deleteFile`.
+- `generateAdminPresignedUploadUrl({ fileName, contentType, path, prefix? })` — Admin-only presigned upload URL. Uses `generateR2Key` and `createPresignedUploadUrl`. Returns `{ presignedUrl, key, publicObjectUrl }`.
+- `generateUserPresignedUploadUrl({ fileName, contentType, path, prefix? })` — Authenticated user presigned upload. Automatically prefixes path with `users/{path}/userid-{userId}` for user isolation.
+- `generatePublicPresignedUploadUrl({ fileName, contentType, path, prefix? })` — Anonymous user presigned upload with rate limiting (using Upstash). Limit configurable via `NEXT_PUBLIC_DAILY_IMAGE_UPLOAD_LIMIT` env (default: 100/day). Admins bypass rate limit.
+- `generateAdminPresignedDownloadUrl(key)` — Admin-only presigned download URL.
+- `generateUserPresignedDownloadUrl(key)` — Authenticated user presigned download URL.
+- `generatePublicPresignedDownloadUrl(key)` — Anonymous user presigned download with rate limiting. Limit configurable via `NEXT_PUBLIC_DAILY_IMAGE_DOWNLOAD_LIMIT` env (default: 100/day). Admins bypass rate limit.
+- AuthN/AuthZ: Admin actions require `isAdmin()`. User actions require `getSession()`. Public actions use IP-based rate limiting via `checkRateLimit` with `getClientIPFromHeaders`.
+- Validation: All inputs validated via zod schemas. Returns `actionResponse.badRequest` on validation errors.
+- Constants: `PRESIGNED_UPLOAD_EXPIRES_IN = 300` (5min), `PRESIGNED_DOWNLOAD_EXPIRES_IN = 300` (5min), `DEFAULT_PAGE_SIZE = 20`, `MAX_PAGE_SIZE = 100`.
 
-Preferred usage:
-- Client-originated uploads (browser/mobile): Prefer presigned URL flow (use `generateUserPresignedUploadUrl` or `generateAdminPresignedUploadUrl`) so the client PUTs directly to R2. Do not use AWS SDK on the client.
-- Server-side-only uploads (server already has the file data, e.g., AI output, image transforms, imports): Prefer `serverUploadFile(...)` to avoid the presign hop.
-- Selection rule of thumb: If the file is created/held by the client and may be large → presigned. If the server produces/holds the bytes → `serverUploadFile`.
-- Always: validate contentType/size, generate keys with `generateR2Key`, persist `{ key, publicObjectUrl }`, never trust client-provided keys or paths, and enforce auth checks (`isAdmin()`/`getSession()`).
+Best Practices:
+- Do not use client-side SDK for uploads. Route all uploads through server actions or route handlers.
+- Client-originated uploads (browser/mobile): Prefer presigned URL flow so client PUTs directly to R2. Choose action based on user type:
+  - Authenticated users → `generateUserPresignedUploadUrl` (auto-isolates by userId)
+  - Admins → `generateAdminPresignedUploadUrl` (full control over path)
+  - Anonymous → `generatePublicPresignedUploadUrl` (rate limited)
+- Server-side-only uploads (AI output, transforms, imports): Prefer `serverUploadFile(...)` to avoid presign hop.
+- Selection rule: Client-held files → presigned. Server-produced bytes → `serverUploadFile`.
+- Always validate contentType/size. Use `lib/validations.ts` for file constraints.
+- Never trust client-provided keys or paths. Always generate keys with `generateR2Key`.
+- Persist both `key` and `publicObjectUrl` in your DB for each uploaded file.
+- Ensure `next.config.mjs` `images.remotePatterns` includes `R2_PUBLIC_URL` hostname (already configured).
