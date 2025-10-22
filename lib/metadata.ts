@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { DEFAULT_LOCALE, LOCALE_NAMES, Locale } from '@/i18n/routing'
+import { DEFAULT_LOCALE, LOCALE_NAMES, LOCALE_TO_HREFLANG, Locale } from '@/i18n/routing'
 import { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 
@@ -12,6 +12,7 @@ type MetadataProps = {
   locale?: Locale
   path?: string
   canonicalUrl?: string
+  availableLocales?: string[]
 }
 
 export async function constructMetadata({
@@ -23,6 +24,7 @@ export async function constructMetadata({
   locale,
   path,
   canonicalUrl,
+  availableLocales,
 }: MetadataProps): Promise<Metadata> {
   const t = await getTranslations({ locale: locale || DEFAULT_LOCALE, namespace: 'Home' })
 
@@ -35,13 +37,25 @@ export async function constructMetadata({
 
   canonicalUrl = canonicalUrl || path
 
-  const alternateLanguages = Object.keys(LOCALE_NAMES).reduce((acc, lang) => {
-    const path = canonicalUrl
+  // Use availableLocales if provided, otherwise use all locales
+  const locales = availableLocales || Object.keys(LOCALE_NAMES)
+
+  const alternateLanguages = locales.reduce((acc, lang) => {
+    const localePath = canonicalUrl
       ? `${lang === DEFAULT_LOCALE ? '' : `/${lang}`}${canonicalUrl === '/' ? '' : canonicalUrl}`
       : `${lang === DEFAULT_LOCALE ? '' : `/${lang}`}`
-    acc[lang] = `${siteConfig.url}${path}`
+    const url = `${siteConfig.url}${localePath}`
+
+    // Use full locale code for hreflang (e.g., en-US, zh-CN, ja-JP)
+    const hreflangCode = LOCALE_TO_HREFLANG[lang] || lang
+    acc[hreflangCode] = url
+
     return acc
   }, {} as Record<string, string>)
+
+  // Add x-default pointing to the English version
+  const defaultPath = canonicalUrl === '/' ? '' : canonicalUrl || ''
+  alternateLanguages['x-default'] = `${siteConfig.url}${defaultPath}`
 
   // Open Graph
   const imageUrls = images.length > 0

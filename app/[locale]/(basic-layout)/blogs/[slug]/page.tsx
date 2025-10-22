@@ -45,6 +45,15 @@ export async function generateMetadata({
   const metadataPath = post.slug.startsWith("/") ? post.slug : `/${post.slug}`;
   const fullPath = `/blogs${metadataPath}`;
 
+  // Detect which locales have this blog post available
+  const availableLocales: string[] = [];
+  for (const checkLocale of LOCALES) {
+    const { post: localePost } = await getPostBySlug(slug, checkLocale);
+    if (localePost) {
+      availableLocales.push(checkLocale);
+    }
+  }
+
   return constructMetadata({
     page: "blogs",
     title: post.title,
@@ -53,6 +62,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     path: fullPath,
     noIndex: isContentRestricted,
+    availableLocales:
+      availableLocales.length > 0 ? availableLocales : undefined,
   });
 }
 

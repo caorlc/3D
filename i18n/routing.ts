@@ -8,6 +8,11 @@ export const LOCALE_NAMES: Record<string, string> = {
   'zh': "中文",
   'ja': "日本語",
 };
+export const LOCALE_TO_HREFLANG: Record<string, string> = {
+  'en': 'en-US',
+  'zh': 'zh-CN',
+  'ja': 'ja-JP',
+};
 
 export const routing = defineRouting({
   locales: LOCALES,
