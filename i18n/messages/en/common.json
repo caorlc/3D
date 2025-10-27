@@ -255,6 +255,7 @@
     "reachedTheEnd": "You've reached the end of all posts",
     "BlogDetail": {
       "featured": "Featured Post",
+      "viewCount": "{count} views",
       "accessRestricted": "Access Restricted",
       "unauthorized": "This article is only available to logged-in users",
       "premium": "Premium Content",

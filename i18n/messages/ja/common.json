@@ -256,6 +256,7 @@
     "reachedTheEnd": "すべての記事を表示しました",
     "BlogDetail": {
       "featured": "特集記事",
+      "viewCount": "{count} 回閲覧",
       "accessRestricted": "アクセス制限",
       "unauthorized": "この記事はログインユーザーのみ閲覧できます",
       "premium": "プレミアムコンテンツ",

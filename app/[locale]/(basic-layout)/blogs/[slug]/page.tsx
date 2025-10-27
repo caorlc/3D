@@ -1,11 +1,15 @@
 import { listPublishedPostsAction } from "@/actions/blogs/posts";
+import {
+  getViewCountAction,
+  incrementViewCountAction,
+} from "@/actions/blogs/views";
 import MDXComponents from "@/components/mdx/MDXComponents";
 import { Button } from "@/components/ui/button";
 import { Link as I18nLink, Locale, LOCALES } from "@/i18n/routing";
 import { getPostBySlug, getPosts } from "@/lib/getBlogs";
 import { constructMetadata } from "@/lib/metadata";
 import dayjs from "dayjs";
-import { ArrowLeftIcon, CalendarIcon } from "lucide-react";
+import { ArrowLeftIcon, CalendarIcon, EyeIcon } from "lucide-react";
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { MDXRemote } from "next-mdx-remote-client/rsc";
@@ -77,6 +81,19 @@ export default async function BlogPage({ params }: { params: Params }) {
   if (!post) {
     notFound();
   }
+
+  // Increment and get view count
+  // Option 1: Count every page load (default)
+  await incrementViewCountAction({ slug, locale });
+
+  // Option 2: Count unique visitors - same IP once per hour (uncomment line below, comment out line above)
+  // await incrementUniqueViewCountAction({ slug, locale });
+
+  const viewCountResult = await getViewCountAction({ slug, locale });
+  const viewCount =
+    viewCountResult.success && viewCountResult.data?.count
+      ? viewCountResult.data.count
+      : 0;
 
   let showRestrictionMessageInsteadOfContent = false;
   let messageTitle = "";
@@ -162,6 +179,11 @@ export default async function BlogPage({ params }: { params: Params }) {
           <div className="flex items-center">
             <CalendarIcon className="mr-2 h-4 w-4" />
             {dayjs(post.publishedAt).format("MMMM D, YYYY")}
+          </div>
+
+          <div className="flex items-center">
+            <EyeIcon className="mr-2 h-4 w-4" />
+            {t("BlogDetail.viewCount", { count: viewCount })}
           </div>
 
           {post.isPinned && (
