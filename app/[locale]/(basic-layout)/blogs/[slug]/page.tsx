@@ -11,6 +11,7 @@ import { getTranslations } from "next-intl/server";
 import { MDXRemote } from "next-mdx-remote-client/rsc";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import remarkGfm from "remark-gfm";
 import { ContentRestrictionMessage } from "./ContentRestrictionMessage";
 
 export const dynamicParams = true;
@@ -213,8 +214,16 @@ export default async function BlogPage({ params }: { params: Params }) {
           backLink={`/blogs`}
         />
       ) : (
-        <article className="prose dark:prose-invert lg:prose-lg prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-img:rounded-xl prose-img:shadow-md max-w-none">
-          <MDXRemote source={post?.content || ""} components={MDXComponents} />
+        <article className="prose dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary prose-img:rounded-xl prose-img:shadow-md max-w-none">
+          <MDXRemote
+            source={post?.content || ""}
+            components={MDXComponents}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [remarkGfm],
+              },
+            }}
+          />
         </article>
       )}
 

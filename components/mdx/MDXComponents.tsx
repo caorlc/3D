@@ -59,7 +59,7 @@ const MDXComponents: MDXComponentsProps = {
   hr: (props) => <hr className="border-t border-gray-200 my-8" {...props} />,
   p: (props) => (
     <p
-      className="mt-6 mb-6 leading-relaxed text-gray-700 dark:text-gray-300"
+      className="my-3 leading-relaxed text-gray-700 dark:text-gray-300"
       {...props}
     />
   ),
@@ -83,7 +83,7 @@ const MDXComponents: MDXComponentsProps = {
   ),
   pre: (props) => {
     const preStyles =
-      "rounded-lg p-4 overflow-x-auto my-4 bg-gray-100 dark:bg-gray-800";
+      "rounded-lg p-3 overflow-x-auto my-4 bg-gray-100 dark:bg-gray-800";
     return (
       <CodeBlock
         {...props}
@@ -102,23 +102,25 @@ const MDXComponents: MDXComponentsProps = {
   ),
   strong: (props) => <strong className="font-bold" {...props} />,
   table: (props) => (
-    <div className="my-8 w-full overflow-x-auto">
+    <div className="my-3 overflow-x-auto">
       <table
-        className="w-full shadow-sm rounded-lg overflow-hidden"
+        className="w-full border-collapse table-fixed overflow-hidden m-0"
         {...props}
       />
     </div>
   ),
-  tr: (props) => <tr className="border-t border-gray-200" {...props} />,
+  thead: (props) => <thead {...props} />,
+  tbody: (props) => <tbody {...props} />,
+  tr: (props) => <tr {...props} />,
   th: (props) => (
     <th
-      className="px-6 py-3 font-bold text-left bg-gray-100 dark:bg-gray-700 [&[align=center]]:text-center [&[align=right]]:text-right"
+      className="border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-2 py-1.5 text-left font-bold min-w-[1em] box-border relative align-top [&[align=center]]:text-center [&[align=right]]:text-right"
       {...props}
     />
   ),
   td: (props) => (
     <td
-      className="px-6 py-4 text-left border-t border-gray-100 dark:border-gray-700 [&[align=center]]:text-center [&[align=right]]:text-right"
+      className="border border-gray-200 dark:border-gray-700 px-2 py-1.5 min-w-[1em] box-border relative align-top [&[align=center]]:text-center [&[align=right]]:text-right"
       {...props}
     />
   ),
