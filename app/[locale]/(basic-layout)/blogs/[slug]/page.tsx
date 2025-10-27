@@ -181,10 +181,12 @@ export default async function BlogPage({ params }: { params: Params }) {
             {dayjs(post.publishedAt).format("MMMM D, YYYY")}
           </div>
 
-          <div className="flex items-center">
-            <EyeIcon className="mr-2 h-4 w-4" />
-            {t("BlogDetail.viewCount", { count: viewCount })}
-          </div>
+          {viewCount > 0 && (
+            <div className="flex items-center">
+              <EyeIcon className="mr-2 h-4 w-4" />
+              {t("BlogDetail.viewCount", { count: viewCount })}
+            </div>
+          )}
 
           {post.isPinned && (
             <div className="flex items-center bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 px-2 py-0.5 rounded-md text-xs">
