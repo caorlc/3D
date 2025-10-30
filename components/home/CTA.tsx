@@ -30,8 +30,8 @@ export default function CTA() {
                 <div className="absolute bottom-8 right-8 w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                <span className="highlight-text">{t("title")}</span>
+              <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
+                <span className="text-primary">{t("title")}</span>
               </h2>
 
               <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">

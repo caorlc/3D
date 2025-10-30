@@ -124,7 +124,7 @@ export function PricesDataTable<TData extends PricingPlan, TValue>({
           </Select>
         </div>
 
-        <Button asChild className="highlight-bg text-white">
+        <Button asChild className="highlight-button">
           <I18nLink
             href="/dashboard/prices/new"
             title="Create New Plan"

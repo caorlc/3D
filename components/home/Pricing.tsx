@@ -125,9 +125,7 @@ export default async function Pricing() {
             className="mb-8"
           />
           <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
-            <span className="bg-clip-text bg-gradient-to-b from-foreground to-muted-foreground text-transparent">
-              {t("title")}
-            </span>
+            <span className="title-gradient">{t("title")}</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t("description")}
@@ -155,9 +153,9 @@ export default async function Pricing() {
               >
                 <span className="flex items-center gap-2">
                   {t("annual")}
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold">
-                    <Gift className="w-4 h-4 text-main" />
-                    <span className="highlight-text">{t("saveTip")}</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold highlight-text">
+                    <Gift className="w-4 h-4" />
+                    {t("saveTip")}
                   </span>
                 </span>
               </TabsTrigger>

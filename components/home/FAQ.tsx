@@ -21,9 +21,7 @@ export default function FAQ() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
-            <span className="bg-clip-text bg-gradient-to-b from-foreground to-muted-foreground text-transparent">
-              {t("title")}
-            </span>
+            <span className="title-gradient">{t("title")}</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t("description")}

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link as I18nLink, Locale, routing } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
@@ -36,13 +37,11 @@ export default async function ForbiddenPage({ params }: { params: Params }) {
         <h1 className="text-2xl font-bold text-red-600 mb-4">{t("title")}</h1>
         <p className="mb-6">{t("description")}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <I18nLink
-            href={t("button.href")}
-            title={t("button.name")}
-            className="px-4 py-2 highlight-bg text-white rounded-md w-full sm:w-auto"
-          >
-            {t("button.name")}
-          </I18nLink>
+          <Button asChild className="px-4 py-2 highlight-button">
+            <I18nLink href={t("button.href")} title={t("button.name")}>
+              {t("button.name")}
+            </I18nLink>
+          </Button>
         </div>
       </div>
     </Card>

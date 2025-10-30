@@ -6,11 +6,6 @@ import { Check, X } from "lucide-react";
 
 type PricingPlan = typeof pricingPlansSchema.$inferSelect;
 
-const defaultBorderStyle = "border-gray-300 dark:border-gray-600";
-const highlightedBorderStyle =
-  "border-indigo-500 dark:border-indigo-500 hover:border-indigo-500 dark:hover:border-indigo-500";
-const highlightedBgStyle = "bg-indigo-500";
-
 interface PricingCardDisplayProps {
   id?: string;
   plan: PricingPlan;
@@ -37,17 +32,17 @@ export function PricingCardDisplay({
   return (
     <div
       id={id}
-      className={`card rounded-xl p-8 shadow-sm border-t-4 ${
-        plan.isHighlighted ? highlightedBorderStyle : defaultBorderStyle
-      } ${
-        plan.isHighlighted ? "shadow-lg transform scale-105 relative z-10" : ""
-      }`}
+      className={cn(
+        "border rounded-xl p-8 shadow-sm border-t-4",
+        "border-gray-300 dark:border-gray-600",
+        "hover:border-primary hover:scale-105 hover:shadow-xl transition-all duration-300",
+        plan.isHighlighted ? "border-primary relative z-10" : ""
+      )}
     >
       {plan.isHighlighted && highlightText && (
         <div
           className={cn(
-            "absolute top-[-1px] right-0 text-white text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg font-medium",
-            highlightedBgStyle
+            "absolute top-[-1px] right-0 highlight-bg text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg font-medium"
           )}
         >
           {highlightText}

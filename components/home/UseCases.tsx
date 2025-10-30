@@ -24,11 +24,11 @@ const UseCaseCard = ({ useCase }: { useCase: UseCase }) => {
         />
         <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background p-6 shadow-sm dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
-            <div className="w-fit rounded-lg border-[0.75px] border-border p-2 highlight-bg text-white dark:text-white">
-              <DynamicIcon name={useCase.icon} className="w-4 h-4" />
-            </div>
             <div className="space-y-3">
-              <h3 className="pt-0.5 text-xl leading-[1.375rem] font-semibold font-sans tracking-[-0.04em] md:text-2xl md:leading-[1.875rem] text-balance text-foreground">
+              <h3 className="flex items-center gap-2 text-xl lg:text-2xl font-semibold font-sans">
+                <div className="w-fit rounded-lg border-border p-2 bg-primary text-white dark:text-white">
+                  <DynamicIcon name={useCase.icon} className="w-4 h-4" />
+                </div>
                 {useCase.title}
               </h3>
               <p className="[&_b]:md:font-semibold [&_strong]:md:font-semibold font-sans text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
@@ -62,9 +62,7 @@ export default function UseCases() {
             className="mb-8"
           />
           <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
-            <span className="bg-clip-text bg-gradient-to-b from-foreground to-muted-foreground text-transparent">
-              {t("title")}
-            </span>
+            <span className="title-gradient">{t("title")}</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t("description")}

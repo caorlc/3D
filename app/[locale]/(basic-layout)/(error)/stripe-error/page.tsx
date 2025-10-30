@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Link as I18nLink, Locale } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
@@ -45,20 +46,16 @@ export default async function StripeErrorPage({
         <h1 className="text-2xl font-bold text-red-600 mb-4">{t("title")}</h1>
         <p className="mb-6">{message}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <I18nLink
-            href="/"
-            title={t("goToHome")}
-            className="px-4 py-2 highlight-bg text-white rounded-md w-full sm:w-auto"
-          >
-            {t("goToHome")}
-          </I18nLink>
-          <I18nLink
-            href="/dashboard"
-            title={t("goToDashboard")}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors w-full sm:w-auto"
-          >
-            {t("goToDashboard")}
-          </I18nLink>
+          <Button asChild className="px-4 py-2 highlight-button">
+            <I18nLink href="/" title={t("goToHome")}>
+              {t("goToHome")}
+            </I18nLink>
+          </Button>
+          <Button asChild variant="outline" className="px-4 py-2">
+            <I18nLink href="/dashboard" title={t("goToDashboard")}>
+              {t("goToDashboard")}
+            </I18nLink>
+          </Button>
         </div>
       </div>
     </Card>

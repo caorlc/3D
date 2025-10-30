@@ -176,12 +176,7 @@ function SuccessContent() {
         variants={fadeIn}
         className="flex flex-col sm:flex-row gap-3 w-full max-w-md"
       >
-        <Button
-          variant="outline"
-          className="flex-1 gap-2 highlight-button"
-          asChild
-          size="lg"
-        >
+        <Button className="flex-1 gap-2 highlight-button" asChild size="lg">
           <I18nLink href="/" title="Back to Home" prefetch={true}>
             <Home className="w-4 h-4" />
             Back to Home <ArrowRight className="w-4 h-4" />

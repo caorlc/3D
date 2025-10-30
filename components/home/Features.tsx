@@ -110,9 +110,7 @@ export default function Features() {
             className="mb-8"
           />
           <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
-            <span className="bg-clip-text bg-gradient-to-b from-foreground to-muted-foreground text-transparent">
-              {t("title")}
-            </span>
+            <span className="title-gradient">{t("title")}</span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {t("description")}
@@ -126,7 +124,7 @@ export default function Features() {
         </div>
 
         <div className="text-center mt-12 py-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-          <h3 className="text-xl font-semibold mb-3 highlight-text">
+          <h3 className="text-xl font-semibold mb-3 text-primary">
             {t("moreFeatures.title")}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-5 max-w-xl mx-auto text-sm">

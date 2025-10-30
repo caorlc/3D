@@ -31,7 +31,7 @@ export default function LoginButton() {
       <Button
         onClick={handleLogin}
         variant="default"
-        className={`highlight-button text-white hover:text-white shadow-lg`}
+        className={`highlight-button shadow-lg`}
       >
         {t("Button.signIn")}
       </Button>

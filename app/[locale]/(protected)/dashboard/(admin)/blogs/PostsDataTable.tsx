@@ -141,7 +141,7 @@ export function PostsDataTable<TData, TValue>({
         />
         <div className="flex space-x-2">
           <TagManagementDialog />
-          <Button asChild className="highlight-bg text-white">
+          <Button asChild className="highlight-button">
             <I18nLink
               href={`/dashboard/blogs/new`}
               title="Create New Blog"

@@ -22,9 +22,7 @@ export default function Hero() {
           />
           <div className="flex gap-4 flex-col max-w-3xl">
             <h1 className="text-center z-10 text-lg md:text-7xl font-sans font-bold">
-              <span className="bg-clip-text bg-gradient-to-b from-foreground to-muted-foreground text-transparent">
-                {t("title")}
-              </span>
+              <span className="title-gradient">{t("title")}</span>
             </h1>
 
             <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground text-center">
