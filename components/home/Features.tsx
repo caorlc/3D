@@ -43,7 +43,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
                   key={detail.title}
                   className="flex flex-row gap-6 items-start"
                 >
-                  <Check className="w-4 h-4 mt-2 text-primary flex-shrink-0" />
+                  <Check className="w-4 h-4 mt-2 text-primary shrink-0" />
                   <div className="flex flex-col gap-1">
                     <p>{detail.title}</p>
                     <p className="text-muted-foreground text-sm">
@@ -123,7 +123,7 @@ export default function Features() {
           ))}
         </div>
 
-        <div className="text-center mt-12 py-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+        <div className="text-center mt-12 py-8 bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
           <h3 className="text-xl font-semibold mb-3 text-primary">
             {t("moreFeatures.title")}
           </h3>

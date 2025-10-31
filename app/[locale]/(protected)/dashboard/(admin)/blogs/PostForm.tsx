@@ -389,7 +389,7 @@ export function PostForm({
                     disabled={isSubmitting}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue
                           placeholder={t("fields.language.placeholder")}
                         />
@@ -603,7 +603,7 @@ export function PostForm({
                     disabled={isSubmitting}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue
                           placeholder={t("fields.status.placeholder")}
                         />
@@ -639,7 +639,7 @@ export function PostForm({
                     disabled={isSubmitting}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="w-full">
                         <SelectValue
                           placeholder={t("fields.visibility.placeholder")}
                         />

@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
       </div>
       <div className="relative min-h-[200px] max-h-[calc(100vh-200px)] overflow-y-auto rounded-md border">
         {isLoading && (
-          <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
+          <div className="absolute inset-0 bg-background/50 backdrop-blur-xs flex items-center justify-center z-10">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}

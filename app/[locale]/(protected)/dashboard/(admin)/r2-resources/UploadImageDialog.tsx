@@ -269,7 +269,7 @@ export function UploadImageDialog({
                       <img
                         src={fileWithStatus.previewUrl}
                         alt="Preview"
-                        className="h-16 w-16 rounded object-cover flex-shrink-0"
+                        className="h-16 w-16 rounded object-cover shrink-0"
                       />
                     )}
                     <div className="flex-1 min-w-0">
@@ -282,7 +282,7 @@ export function UploadImageDialog({
                             {(fileWithStatus.file.size / 1024).toFixed(2)} KB
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           {getStatusIcon(fileWithStatus.status)}
                           {fileWithStatus.status === "pending" &&
                             !uploading && (

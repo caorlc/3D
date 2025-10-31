@@ -76,7 +76,7 @@ function OverviewStatsSkeleton() {
       {[0, 1, 2, 3].map((i) => (
         <Card
           key={i}
-          className="bg-gradient-to-b from-background to-muted dark:to-muted/50"
+          className="bg-linear-to-b from-background to-muted dark:to-muted/50"
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-normal text-muted-foreground">

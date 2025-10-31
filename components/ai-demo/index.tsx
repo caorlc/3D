@@ -104,9 +104,9 @@ export default function AIDemo() {
               key={item.id}
               onClick={() => scrollToSection(item.id)}
               className={cn(
-                "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-full transition-all duration-300 whitespace-nowrap flex-shrink-0",
+                "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-full transition-all duration-300 whitespace-nowrap shrink-0",
                 activeSection === item.id
-                  ? `${item.bgColor} ${item.color} shadow-sm`
+                  ? `${item.bgColor} ${item.color} shadow-xs`
                   : "hover:bg-muted text-muted-foreground hover:text-foreground"
               )}
             >

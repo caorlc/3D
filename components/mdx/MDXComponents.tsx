@@ -114,13 +114,13 @@ const MDXComponents: MDXComponentsProps = {
   tr: (props) => <tr {...props} />,
   th: (props) => (
     <th
-      className="border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-2 py-1.5 text-left font-bold min-w-[1em] box-border relative align-top [&[align=center]]:text-center [&[align=right]]:text-right"
+      className="border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-2 py-1.5 text-left font-bold min-w-[1em] box-border relative align-top [[align=center]]:text-center [[align=right]]:text-right"
       {...props}
     />
   ),
   td: (props) => (
     <td
-      className="border border-gray-200 dark:border-gray-700 px-2 py-1.5 min-w-[1em] box-border relative align-top [&[align=center]]:text-center [&[align=right]]:text-right"
+      className="border border-gray-200 dark:border-gray-700 px-2 py-1.5 min-w-[1em] box-border relative align-top [[align=center]]:text-center [[align=right]]:text-right"
       {...props}
     />
   ),

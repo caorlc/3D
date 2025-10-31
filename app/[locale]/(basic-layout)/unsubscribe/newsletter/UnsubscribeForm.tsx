@@ -57,7 +57,7 @@ export default function UnsubscribeForm({
       <div className="space-y-6">
         <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-4 rounded-lg">
           <div className="flex items-center">
-            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 flex-shrink-0" />
+            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3 shrink-0" />
             <p className="text-green-800 dark:text-green-300 font-medium">
               {t("unsubscribe.success")}
             </p>
@@ -93,7 +93,7 @@ export default function UnsubscribeForm({
           <I18nLink
             href="/"
             title={t("unsubscribe.backToHome")}
-            className="inline-flex items-center justify-center w-full px-4 py-3 bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="inline-flex items-center justify-center w-full px-4 py-3 bg-linear-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             {t("unsubscribe.backToHome")}
@@ -108,7 +108,7 @@ export default function UnsubscribeForm({
       <div className="space-y-6">
         <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 rounded-lg">
           <div className="flex items-start">
-            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mr-3 mt-0.5 flex-shrink-0" />
+            <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 mr-3 mt-0.5 shrink-0" />
             <p className="text-red-800 dark:text-red-300 font-medium">
               {errorMessage}
             </p>
@@ -147,7 +147,7 @@ export default function UnsubscribeForm({
     <div className="space-y-6">
       <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-4 rounded-lg">
         <div className="flex items-start">
-          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mr-3 mt-0.5 flex-shrink-0" />
+          <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 mr-3 mt-0.5 shrink-0" />
           <div>
             <h3 className="text-amber-800 dark:text-amber-300 font-medium mb-2">
               {t("unsubscribe.confirmTitle")}
@@ -170,7 +170,7 @@ export default function UnsubscribeForm({
         <button
           onClick={handleUnsubscribe}
           disabled={status === "loading"}
-          className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 disabled:from-red-400 disabled:to-rose-400 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 disabled:from-red-400 disabled:to-rose-400 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
         >
           {status === "loading" ? (
             <div className="flex items-center justify-center">

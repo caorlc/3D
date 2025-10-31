@@ -12,8 +12,8 @@ type UseCase = {
 
 const UseCaseCard = ({ useCase }: { useCase: UseCase }) => {
   return (
-    <li className="min-h-[16rem] list-none">
-      <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-border p-2 md:rounded-[1.5rem] md:p-3">
+    <li className="min-h-64 list-none">
+      <div className="relative h-full rounded-[1.25rem] border-[0.75px] border-border p-2 md:rounded-3xl md:p-3">
         <GlowingEffect
           spread={40}
           glow={true}
@@ -22,7 +22,7 @@ const UseCaseCard = ({ useCase }: { useCase: UseCase }) => {
           inactiveZone={0.01}
           borderWidth={3}
         />
-        <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background p-6 shadow-sm dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6">
+        <div className="relative flex h-full flex-col justify-between gap-6 overflow-hidden rounded-xl border-[0.75px] bg-background p-6 shadow-xs dark:shadow-[0px_0px_27px_0px_rgba(45,45,45,0.3)] md:p-6">
           <div className="relative flex flex-1 flex-col justify-between gap-3">
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-xl lg:text-2xl font-semibold font-sans">
@@ -31,7 +31,7 @@ const UseCaseCard = ({ useCase }: { useCase: UseCase }) => {
                 </div>
                 {useCase.title}
               </h3>
-              <p className="[&_b]:md:font-semibold [&_strong]:md:font-semibold font-sans text-sm leading-[1.125rem] md:text-base md:leading-[1.375rem] text-muted-foreground">
+              <p className="md:[&_b]:font-semibold md:[&_strong]:font-semibold font-sans text-sm leading-4.5 md:text-base md:leading-5.5 text-muted-foreground">
                 {useCase.description}
               </p>
             </div>

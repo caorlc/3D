@@ -38,8 +38,8 @@ export default async function Page(props: { searchParams: SearchParams }) {
   return (
     <div className=" py-16 px-4">
       <div className="max-w-md mx-auto">
-        <div className="bg-card border border-border rounded-xl shadow-xl overflow-hidden backdrop-blur-sm">
-          <div className="bg-gradient-to-r from-indigo-500 to-cyan-500 p-6 text-center">
+        <div className="bg-card border border-border rounded-xl shadow-xl overflow-hidden backdrop-blur-xs">
+          <div className="bg-linear-to-r from-indigo-500 to-cyan-500 p-6 text-center">
             <h1 className="text-2xl font-bold text-white">
               {t("unsubscribe.title")}
             </h1>

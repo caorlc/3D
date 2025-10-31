@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
   return (
     <div className="bg-secondary/20 py-8 sm:py-12">
       <div className="container mx-auto max-w-4xl px-4">
-        <div className="bg-background rounded-xl border p-6 shadow-sm sm:p-8 dark:border-zinc-800">
+        <div className="bg-background rounded-xl border p-6 shadow-xs sm:p-8 dark:border-zinc-800">
           <h1 className="mb-6 text-2xl font-bold sm:text-3xl">
             Terms of Service
           </h1>

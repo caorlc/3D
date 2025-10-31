@@ -122,7 +122,7 @@ export function LanguageDetectionAlert() {
                   "flex items-center gap-2 px-3 py-2 rounded-lg",
                   "bg-primary text-primary-foreground hover:bg-primary/90",
                   "text-sm font-medium transition-colors",
-                  "group focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  "group focus:outline-hidden focus:ring-2 focus:ring-primary/50"
                 )}
                 aria-label={`${alertMessages.switchTo} ${LOCALE_NAMES[detectedLocale]}`}
               >
@@ -137,7 +137,7 @@ export function LanguageDetectionAlert() {
           </div>
         </div>
 
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/10 to-transparent pointer-events-none opacity-50" />
+        <div className="absolute inset-0 rounded-xl bg-linear-to-r from-primary/10 to-transparent pointer-events-none opacity-50" />
       </div>
     </div>
   );

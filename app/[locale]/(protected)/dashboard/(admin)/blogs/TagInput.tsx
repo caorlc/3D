@@ -64,7 +64,7 @@ export function TagInput({ value, onChange, disabled }: TagInputProps) {
             {tag.name}
             <button
               type="button"
-              className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="ml-1 rounded-full outline-hidden ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
               onClick={() => handleDeselectTag(tag.id)}
               aria-label={`Remove ${tag.name}`}
               disabled={disabled}

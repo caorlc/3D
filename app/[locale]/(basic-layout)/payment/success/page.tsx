@@ -246,7 +246,7 @@ function SuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <main className="container max-w-screen-xl mx-auto">
+    <main className="container max-w-(--breakpoint-xl) mx-auto">
       <Suspense
         fallback={
           <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center px-4">

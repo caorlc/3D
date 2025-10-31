@@ -566,9 +566,9 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Column 1: Core Info & Stripe */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>{t("coreInformation")}</CardTitle>
@@ -767,7 +767,9 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
                             type="number"
                             step="0.01"
                             {...field}
-                            value={field.value ?? ""}
+                            value={
+                              Number.isNaN(field.value) ? 0 : (field.value ?? 0)
+                            }
                             onChange={(event) =>
                               field.onChange(
                                 event.target.value === ""
@@ -822,7 +824,7 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
                           }
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder="Select a coupon (optional)" />
                             </SelectTrigger>
                           </FormControl>
@@ -1318,27 +1320,26 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
                 />
               </CardContent>
             </Card>
-          </div>
 
-          {/* Column 2: Settings & Actions */}
-          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>{t("settings")}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="displayOrder"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="rounded-lg border p-4">
                       <FormLabel>{t("displayOrder")}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           {...field}
                           disabled={isLoading}
-                          value={field.value ?? 0}
+                          value={
+                            Number.isNaN(field.value) ? 0 : (field.value ?? 0)
+                          }
                         />
                       </FormControl>
                       <FormDescription>
@@ -1373,7 +1374,10 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
                 />
               </CardContent>
             </Card>
+          </div>
 
+          {/* Column 2: Preview - Sticky on desktop, below buttons on mobile */}
+          <div className="lg:sticky lg:top-16 lg:self-start space-y-4">
             <Alert
               variant="default"
               className="border-amber-500 bg-amber-50 dark:bg-amber-950/20"
@@ -1387,27 +1391,6 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
               </AlertDescription>
             </Alert>
 
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isLoading}
-              >
-                {t("cancel")}
-              </Button>
-              <Button
-                type="submit"
-                variant="default"
-                disabled={isLoading || isVerifyingStripe}
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : null}
-                {isEditMode ? t("saveChanges") : t("createPlan")}
-              </Button>
-            </div>
-
             {/* Pricing Card Preview */}
             <PricingCardPreview
               watchedValues={
@@ -1417,6 +1400,28 @@ export function PricePlanForm({ initialData, planId }: PricePlanFormProps) {
               }
             />
           </div>
+        </div>
+
+        {/* Action Buttons - Below form on mobile, below left column on desktop */}
+        <div className="flex justify-end gap-3 py-6 border-t">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+            disabled={isLoading}
+          >
+            {t("cancel")}
+          </Button>
+          <Button
+            type="submit"
+            variant="default"
+            disabled={isLoading || isVerifyingStripe}
+          >
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            {isEditMode ? t("saveChanges") : t("createPlan")}
+          </Button>
         </div>
       </form>
     </Form>

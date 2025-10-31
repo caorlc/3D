@@ -30,15 +30,15 @@ export default function Hero() {
             </p>
           </div>
           <div className="flex flex-row gap-2">
-            <RainbowButton>
-              <I18nLink
-                href={t("getStartedLink") || "#"}
-                className="flex items-center gap-2"
-              >
+            <I18nLink
+              href={t("getStartedLink") || "#"}
+              className="flex items-center gap-2"
+            >
+              <RainbowButton>
                 <MousePointerClick className="w-4 h-4" />
                 {t("getStarted")}
-              </I18nLink>
-            </RainbowButton>
+              </RainbowButton>
+            </I18nLink>
             <Button
               className="h-11 rounded-xl px-8 py-2 bg-white text-indigo-500 hover:text-indigo-600 border-2 border-indigo-500"
               variant="outline"

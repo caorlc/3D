@@ -33,7 +33,7 @@ export function PricingCardDisplay({
     <div
       id={id}
       className={cn(
-        "border rounded-xl p-8 shadow-sm border-t-4",
+        "border rounded-xl p-8 shadow-xs border-t-4",
         "border-gray-300 dark:border-gray-600",
         "hover:border-primary hover:scale-105 hover:shadow-xl transition-all duration-300",
         plan.isHighlighted ? "border-primary relative z-10" : ""
@@ -42,7 +42,7 @@ export function PricingCardDisplay({
       {plan.isHighlighted && highlightText && (
         <div
           className={cn(
-            "absolute top-[-1px] right-0 highlight-bg text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg font-medium"
+            "absolute -top-px right-0 highlight-bg text-xs px-3 py-1 rounded-bl-lg rounded-tr-lg font-medium"
           )}
         >
           {highlightText}
@@ -50,7 +50,7 @@ export function PricingCardDisplay({
       )}
       <h3 className="text-2xl font-semibold mb-2">{cardTitle}</h3>
       {cardDescription && (
-        <p className="text-muted-foreground mb-6 h-[3rem]">{cardDescription}</p>
+        <p className="text-muted-foreground mb-6 h-12">{cardDescription}</p>
       )}
 
       <PricingCTA plan={plan} localizedPlan={localizedPlan} />
@@ -76,9 +76,9 @@ export function PricingCardDisplay({
           ) => (
             <li key={index} className="flex items-start">
               {feature.included ? (
-                <Check className="text-green-500 h-5 w-5 mt-1 mr-3 flex-shrink-0" />
+                <Check className="text-green-500 h-5 w-5 mt-1 mr-3 shrink-0" />
               ) : (
-                <X className="text-red-500 h-5 w-5 mt-1 mr-3 flex-shrink-0 opacity-50" />
+                <X className="text-red-500 h-5 w-5 mt-1 mr-3 shrink-0 opacity-50" />
               )}
               <span
                 className={cn(

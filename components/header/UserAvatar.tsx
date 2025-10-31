@@ -22,7 +22,7 @@ export function UserAvatar({ user }: { user: User }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="focus:outline-none">
+      <DropdownMenuTrigger className="focus:outline-hidden">
         <Avatar className="h-8 w-8">
           <AvatarImage src={user.image || undefined} />
           <AvatarFallback>{fallbackLetter}</AvatarFallback>

@@ -15,7 +15,7 @@ export function Aside({
   return (
     <div
       className={cn(
-        "flex border-5 py-3 px-4 ms-2 ms-md-0 my-10 rounded rounded-1 shadow",
+        "flex border-5 py-3 px-4 ms-2 ms-md-0 my-10 rounded rounded-1 shadow-sm",
         "bg-[#6edff633] border-[#6edff633] border-l-[#f6ef6e]"
       )}
       {...props}

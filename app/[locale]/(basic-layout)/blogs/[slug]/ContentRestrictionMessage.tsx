@@ -20,12 +20,12 @@ export function ContentRestrictionMessage({
   backLink,
 }: ContentRestrictionMessageProps) {
   return (
-    <div className="relative w-full bg-card/50 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden my-10 border border-border/50">
-      <div className="h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+    <div className="relative w-full bg-card/50 backdrop-blur-xs rounded-xl shadow-xl overflow-hidden my-10 border border-border/50">
+      <div className="h-1.5 bg-linear-to-r from-blue-500 via-purple-500 to-pink-500"></div>
 
       <div className="p-10 flex flex-col items-center">
         <div className="flex items-center justify-center mb-8">
-          <div className="p-5 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-primary/20">
+          <div className="p-5 rounded-full bg-linear-to-br from-blue-500/10 to-purple-500/10 border border-primary/20">
             <LockIcon className="w-12 h-12 text-primary" />
           </div>
         </div>
@@ -58,7 +58,7 @@ export function ContentRestrictionMessage({
               <Button
                 asChild
                 size="lg"
-                className="w-full sm:flex-1 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white group"
+                className="w-full sm:flex-1 bg-linear-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white group"
               >
                 <I18nLink
                   href={actionLink}
@@ -75,8 +75,8 @@ export function ContentRestrictionMessage({
         )}
       </div>
 
-      <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-gradient-to-tr from-blue-500/10 to-transparent"></div>
-      <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gradient-to-bl from-purple-500/10 to-transparent"></div>
+      <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-linear-to-tr from-blue-500/10 to-transparent"></div>
+      <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-linear-to-bl from-purple-500/10 to-transparent"></div>
     </div>
   );
 }

@@ -109,7 +109,7 @@ export function TagSelectDialog({
                   {tag.name}
                   <button
                     type="button"
-                    className="ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    className="ml-1 rounded-full outline-hidden ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     onClick={() => handleDeselectTag(tag.id)}
                     aria-label={`Remove ${tag.name}`}
                   >
@@ -122,7 +122,7 @@ export function TagSelectDialog({
         )}
 
         {isLoadingInitialTags ? (
-          <div className="flex flex-grow justify-center items-center p-4 min-h-[150px]">
+          <div className="flex grow justify-center items-center p-4 min-h-[150px]">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             <span className="ml-2">
               {t("loadingTagsMessage") || "Loading tags..."}
@@ -130,13 +130,13 @@ export function TagSelectDialog({
           </div>
         ) : (
           <>
-            <Command className="flex-grow overflow-hidden">
+            <Command className="grow overflow-hidden">
               <div className="w-full">
                 <CommandInput
                   placeholder="Search for tags..."
                   value={searchTerm}
                   onValueChange={setSearchTerm}
-                  className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0"
+                  className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0"
                 />
               </div>
 
@@ -154,7 +154,7 @@ export function TagSelectDialog({
                 )}
               </div>
 
-              <ScrollArea className="flex-grow h-[calc(80vh-300px)]">
+              <ScrollArea className="grow h-[calc(80vh-300px)]">
                 {selectableTags.length === 0 ? (
                   <div className="py-6 text-center text-sm text-muted-foreground">
                     No tags found.

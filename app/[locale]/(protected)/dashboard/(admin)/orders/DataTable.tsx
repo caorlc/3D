@@ -232,7 +232,7 @@ export function OrdersDataTable<TData, TValue>({
       </div>
       <div className="relative min-h-[200px] max-h-[calc(100vh-200px)] overflow-auto rounded-md border">
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-xs">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         )}

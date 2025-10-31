@@ -71,7 +71,7 @@ export function Newsletter() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
             required
-            className="bg-gray-800 text-white px-4 py-2 rounded-l-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="bg-gray-800 text-white px-4 py-2 rounded-l-lg w-full focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
             disabled={subscribeStatus === "loading"}
           />
           <button

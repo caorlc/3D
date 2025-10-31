@@ -59,7 +59,7 @@ export function PricingCardPreview({ watchedValues }: PricingCardPreviewProps) {
   }, [watchedValues, displayLocale]);
 
   return (
-    <div className="mt-8 md:col-span-1 space-y-6 sticky top-20">
+    <div className="mt-8 md:col-span-1 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>

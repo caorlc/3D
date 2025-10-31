@@ -67,12 +67,12 @@ export const GrowthChart = () => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="p-2 bg-background border rounded-md shadow-lg">
-          <p className="font-bold">{label}</p>
-          <p style={{ color: "hsl(var(--chart-2))" }}>
+        <div className="rounded-md shadow-lg bg-card p-2">
+          <p className="font-semibold">{label}</p>
+          <p style={{ color: "var(--chart-1)" }}>
             {t("newUsers")}: {payload[0].value}
           </p>
-          <p style={{ color: "hsl(var(--chart-1))" }}>
+          <p style={{ color: "var(--chart-1)" }}>
             {t("newOrders")}: {payload[1].value}
           </p>
         </div>
@@ -115,24 +115,24 @@ export const GrowthChart = () => {
                 <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor="hsl(var(--chart-2))"
+                    stopColor="var(--chart-2)"
                     stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
-                    stopColor="hsl(var(--chart-2))"
+                    stopColor="var(--chart-2)"
                     stopOpacity={0}
                   />
                 </linearGradient>
                 <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
                   <stop
                     offset="5%"
-                    stopColor="hsl(var(--chart-1))"
+                    stopColor="var(--chart-1)"
                     stopOpacity={0.8}
                   />
                   <stop
                     offset="95%"
-                    stopColor="hsl(var(--chart-1))"
+                    stopColor="var(--chart-1)"
                     stopOpacity={0}
                   />
                 </linearGradient>
@@ -157,7 +157,7 @@ export const GrowthChart = () => {
                 type="monotone"
                 dataKey="newUsersCount"
                 name={t("newUsers")}
-                stroke="hsl(var(--chart-2))"
+                stroke="var(--chart-2)"
                 fill="url(#colorUsers)"
                 fillOpacity={1}
               />
@@ -165,7 +165,7 @@ export const GrowthChart = () => {
                 type="monotone"
                 dataKey="newOrdersCount"
                 name={t("newOrders")}
-                stroke="hsl(var(--chart-1))"
+                stroke="var(--chart-1)"
                 fill="url(#colorOrders)"
                 fillOpacity={1}
               />

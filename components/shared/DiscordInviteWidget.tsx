@@ -25,7 +25,7 @@ const DiscordInviteWidget: React.FC = () => {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           className={`
-          fixed bottom-20 z-[1000]
+          fixed bottom-20 z-1000
           w-14 h-14 
           bg-[#5865F2] hover:bg-[#4752C4] 
           text-white 

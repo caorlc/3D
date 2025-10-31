@@ -143,7 +143,7 @@ export function TagManagementDialog() {
           <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
-        <div className="flex-grow overflow-hidden">
+        <div className="grow overflow-hidden">
           <div className="mt-1 mb-4 mx-1">
             <TagCreateForm
               existingTags={tags}

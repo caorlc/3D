@@ -141,7 +141,7 @@ export default async function Pricing() {
             {monthlyPlans.length > 0 && (
               <TabsTrigger
                 value="monthly"
-                className="px-6 py-2 text-sm font-normal rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-800 dark:text-gray-300 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
+                className="px-6 py-2 text-sm font-normal rounded-md data-[state=active]:bg-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-gray-800 dark:text-gray-300 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
               >
                 {t("monthly")}
               </TabsTrigger>
@@ -149,7 +149,7 @@ export default async function Pricing() {
             {annualPlans.length > 0 && (
               <TabsTrigger
                 value="annual"
-                className="px-6 py-2 text-sm font-normal rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-800 dark:text-gray-300 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white relative"
+                className="px-6 py-2 text-sm font-normal rounded-md data-[state=active]:bg-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-gray-800 dark:text-gray-300 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white relative"
               >
                 <span className="flex items-center gap-2">
                   {t("annual")}
@@ -163,7 +163,7 @@ export default async function Pricing() {
             {oneTimePlans.length > 0 && (
               <TabsTrigger
                 value="one_time"
-                className="px-6 py-2 text-sm font-normal rounded-md data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-gray-800 dark:text-gray-300 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
+                className="px-6 py-2 text-sm font-normal rounded-md data-[state=active]:bg-white data-[state=active]:shadow-xs dark:data-[state=active]:bg-gray-800 dark:text-gray-300 data-[state=active]:text-gray-900 dark:data-[state=active]:text-white"
               >
                 {t("onetime")}
               </TabsTrigger>
