@@ -21,8 +21,8 @@ import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 // Preload the default demo GLB and showcase models to reduce first-load issues
-useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-demo.glb");
-useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-1.glb");
+useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-2.glb");
+useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-2.glb");
 useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-2.glb");
 
 interface Model3DViewerProps {
@@ -48,6 +48,28 @@ interface Model3DViewerProps {
 }
 
 type ModelBoundsCallback = (center: THREE.Vector3, radius: number) => void;
+
+// Non-blocking idle trigger: schedules heavy work when the browser is idle
+function useIdleTrigger(delayMs = 500): boolean {
+  const [isIdle, setIsIdle] = useState(false);
+  useEffect(() => {
+    let timeoutId: any;
+    let idleId: any;
+    const onIdle = () => setIsIdle(true);
+    if (typeof (window as any).requestIdleCallback === "function") {
+      idleId = (window as any).requestIdleCallback(onIdle, { timeout: Math.max(1000, delayMs * 2) });
+    } else {
+      timeoutId = setTimeout(onIdle, delayMs);
+    }
+    return () => {
+      if (idleId && typeof (window as any).cancelIdleCallback === "function") {
+        (window as any).cancelIdleCallback(idleId);
+      }
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [delayMs]);
+  return isIdle;
+}
 
 // Loading progress component - must be inside Canvas
 // Simple loading indicator without useProgress to avoid SSR issues
@@ -101,29 +123,10 @@ function DefaultModelWithFile({
   // Add cache-busting to default model URL (no caching)
   const defaultModelUrlWithCacheBust = useCacheBustUrl(defaultModelUrl);
 
-  // Debug: log URL before loading
-  useEffect(() => {
-    console.log("[DefaultModelWithFile] Attempting to load:", defaultModelUrlWithCacheBust, "from original:", defaultModelUrl);
-  }, [defaultModelUrlWithCacheBust, defaultModelUrl]);
-
   // Use useGLTF hook (must be called at top level)
   // Errors will be caught by ErrorBoundary
   const gltf = useGLTF(defaultModelUrlWithCacheBust);
   const { scene } = gltf;
-
-  // Debug: log when scene is loaded
-  useEffect(() => {
-    if (scene) {
-      console.log("[DefaultModelWithFile] Scene loaded successfully:", defaultModelUrl, scene);
-      console.log("[DefaultModelWithFile] Scene children count:", scene.children.length);
-      // Log bounding box info
-      const box = new THREE.Box3().setFromObject(scene);
-      const size = box.getSize(new THREE.Vector3());
-      console.log("[DefaultModelWithFile] Model size:", size);
-    } else {
-      console.warn("[DefaultModelWithFile] Scene is null/undefined for:", defaultModelUrl);
-    }
-  }, [scene, defaultModelUrl]);
 
   useEffect(() => {
     if (!autoRotate || !groupRef.current) return;
@@ -279,10 +282,15 @@ function DefaultModel({
 // Helper hook to add cache-busting parameter to URL
 // Forces reload on every component mount (no caching)
 function useCacheBustUrl(url: string): string {
-  // Generate a new timestamp on each component mount to force reload
-  const cacheBust = useMemo(() => Date.now(), [url]); // Regenerate when URL changes
-  const separator = url.includes("?") ? "&" : "?";
-  return `${url}${separator}_t=${cacheBust}`;
+  return useMemo(() => {
+    if (process.env.NODE_ENV === "production") {
+      return url;
+    }
+
+    const cacheBust = Date.now();
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}_t=${cacheBust}`;
+  }, [url]);
 }
 
 // Helper component to load OBJ with MTL
@@ -310,11 +318,6 @@ function OBJWithMTLInternal({
   const scene = useLoader(OBJLoader, objUrl, (loader) => {
     (loader as OBJLoader).setMaterials(materials);
   }) as THREE.Group;
-
-  // Debug: log when OBJ is loaded
-  useEffect(() => {
-    console.log("[OBJWithMTLInternal] OBJ loaded successfully:", url, scene);
-  }, [scene, url]);
 
   const groupRef = useRef<THREE.Group>(null);
 
@@ -432,11 +435,6 @@ function OBJWithoutMTL({
   // Load OBJ file without materials
   const scene = useLoader(OBJLoader, objUrl) as THREE.Group;
 
-  // Debug: log when OBJ is loaded
-  useEffect(() => {
-    console.log("[OBJWithoutMTL] OBJ loaded successfully:", url, scene);
-  }, [scene, url]);
-
   const groupRef = useRef<THREE.Group>(null);
 
   useEffect(() => {
@@ -544,48 +542,10 @@ function GLTFModel({
   // Add cache-busting to URL to force reload (no caching)
   const gltfUrl = useCacheBustUrl(url);
 
-  // Debug: log URL before loading
-  useEffect(() => {
-    console.log("[GLTFModel] Attempting to load:", gltfUrl, "from original:", url);
-    console.log("[GLTFModel] URL type check - isGLB:", url.toLowerCase().endsWith(".glb"), "isGLTF:", url.toLowerCase().endsWith(".gltf"));
-  }, [gltfUrl, url]);
-
   // Use useGLTF for GLTF/GLB files (must be called at top level)
   // If loading fails, useGLTF will throw an error which will be caught by ErrorBoundary
   const gltf = useGLTF(gltfUrl);
   const scene = gltf.scene;
-
-  // Debug: log when scene is loaded
-  useEffect(() => {
-    if (scene) {
-      console.log("[GLTFModel] Scene loaded successfully:", url, scene);
-      console.log("[GLTFModel] Scene children count:", scene.children.length);
-      console.log("[GLTFModel] Scene type:", scene.type);
-      console.log("[GLTFModel] Scene visible:", scene.visible);
-
-      // Log bounding box info
-      const box = new THREE.Box3().setFromObject(scene);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      console.log("[GLTFModel] Model size:", size);
-      console.log("[GLTFModel] Model center:", center);
-      console.log("[GLTFModel] Model is empty:", size.x === 0 && size.y === 0 && size.z === 0);
-
-      let meshCount = 0;
-      scene.traverse((child: THREE.Object3D) => {
-        if (child instanceof THREE.Mesh) {
-          meshCount++;
-          console.log("[GLTFModel] Found mesh:", child.name || "unnamed",
-            "vertices:", child.geometry.attributes.position?.count || 0,
-            "visible:", child.visible,
-            "material:", child.material?.constructor.name);
-        }
-      });
-      console.log("[GLTFModel] Total mesh count:", meshCount);
-    } else {
-      console.warn("[GLTFModel] Scene is null/undefined for:", url);
-    }
-  }, [scene, url]);
 
   const groupRef = useRef<THREE.Group>(null);
 
@@ -624,16 +584,12 @@ function GLTFModel({
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
 
-        console.log("[GLTFModel] Centering/Scaling - size:", size, "maxDim:", maxDim, "center:", center);
-
         // Skip if model has no size
         if (maxDim === 0) {
-          console.warn("[GLTFModel] Model has no size, skipping scale/center");
           return;
         }
 
         const scale = 3.5 / maxDim;
-        console.log("[GLTFModel] Applying scale:", scale);
 
         // Reset scale and position first
         scene.scale.set(1, 1, 1);
@@ -656,8 +612,6 @@ function GLTFModel({
         if (finalSphere && onBoundsComputed) {
           onBoundsComputed(finalSphere.center.clone(), finalSphere.radius);
         }
-
-        console.log("[GLTFModel] Model centered and scaled. Final position:", scene.position, "Final scale:", scene.scale);
       } catch (error) {
         console.error("[GLTFModel] Error in center/scale:", error);
       }
@@ -818,6 +772,7 @@ export default function Model3DViewer({
   const [isClient, setIsClient] = useState(false);
   const controlsRef = useRef<any>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const isIdle = useIdleTrigger(600);
 
   // Ensure component only renders on client side to avoid SSR issues
   useEffect(() => {
@@ -866,11 +821,8 @@ export default function Model3DViewer({
 
   // Don't show default model when processing
   const isDefaultModel = !modelUrl && generationStatus !== "processing";
-
-  // Debug: log modelUrl changes
-  useEffect(() => {
-    console.log("[Model3DViewer] modelUrl changed:", modelUrl, "isDefaultModel:", isDefaultModel, "generationStatus:", generationStatus);
-  }, [modelUrl, isDefaultModel, generationStatus]);
+  // Only mount heavy model when idle (keep default demo eager to enhance first impression)
+  const allowHeavyMount = isDefaultModel ? true : isIdle;
 
   useEffect(() => {
     setIsAutoRotating(autoRotate);
@@ -1046,7 +998,8 @@ export default function Model3DViewer({
           <Canvas
             key={retryKey}
             camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 1000 }}
-            dpr={[1, 1.5]}
+            dpr={[1, 1.25]}
+            frameloop={allowHeavyMount ? "always" : "demand"}
             gl={{
               antialias: true,
               alpha: false,
@@ -1086,8 +1039,7 @@ export default function Model3DViewer({
               <ambientLight intensity={0.8} />
               <directionalLight position={[10, 10, 5]} intensity={1.5} />
               <directionalLight position={[-10, 5, -5]} intensity={0.8} />
-              <pointLight position={[0, 10, 0]} intensity={0.5} />
-              <pointLight position={[-10, -10, -10]} intensity={0.4} />
+              <pointLight position={[0, 10, 0]} intensity={0.45} />
 
               {isDefaultModel ? (
                 <DefaultModel
@@ -1096,31 +1048,33 @@ export default function Model3DViewer({
                   onBoundsComputed={handleModelBoundsComputed}
                 />
               ) : modelUrl ? (
-                <ModelErrorBoundary
-                  fallback={
-                    <mesh>
-                      <boxGeometry args={[1, 1, 1]} />
-                      <meshStandardMaterial color="#ff0000" />
-                    </mesh>
-                  }
-                  onError={(error) => {
-                    console.error("[Model3DViewer] Model loading error:", error);
-                    if (error.message?.includes("timeout") || error.message?.includes("Failed to fetch")) {
-                      setModelLoadError("模型文件过大或网络连接超时，请稍后重试");
-                    } else if (error.message?.includes("CORS")) {
-                      setModelLoadError("跨域访问被阻止，请联系管理员");
-                    } else {
-                      setModelLoadError("模型加载失败，请检查文件格式或重试");
+                allowHeavyMount ? (
+                  <ModelErrorBoundary
+                    fallback={
+                      <mesh>
+                        <boxGeometry args={[1, 1, 1]} />
+                        <meshStandardMaterial color="#ff0000" />
+                      </mesh>
                     }
-                  }}
-                >
-                  <Model
-                    url={modelUrl}
-                    autoRotate={isAutoRotating}
-                    showTexture={showTexture}
-                    onBoundsComputed={handleModelBoundsComputed}
-                  />
-                </ModelErrorBoundary>
+                    onError={(error) => {
+                      console.error("[Model3DViewer] Model loading error:", error);
+                      if (error.message?.includes("timeout") || error.message?.includes("Failed to fetch")) {
+                        setModelLoadError("模型文件过大或网络连接超时，请稍后重试");
+                      } else if (error.message?.includes("CORS")) {
+                        setModelLoadError("跨域访问被阻止，请联系管理员");
+                      } else {
+                        setModelLoadError("模型加载失败，请检查文件格式或重试");
+                      }
+                    }}
+                  >
+                    <Model
+                      url={modelUrl}
+                      autoRotate={isAutoRotating}
+                      showTexture={showTexture}
+                      onBoundsComputed={handleModelBoundsComputed}
+                    />
+                  </ModelErrorBoundary>
+                ) : null
               ) : null}
 
               <OrbitControls

@@ -448,10 +448,10 @@ export default function AI3DInteraction() {
   };
 
   return (
-    <div className="flex-1 w-full bg-[#0f1419] text-white flex overflow-hidden">
+    <div className="flex-1 w-full bg-[#0f1419] text-white flex overflow-hidden min-h-0">
       {/* Left Panel - Interaction Area (1/3) */}
-      <div className="w-1/3 border-r border-[#1f2937] overflow-y-auto h-full">
-        <div className="p-6 space-y-5">
+      <div className="basis-1/3 shrink-0 border-r border-[#1f2937] flex flex-col min-h-0">
+        <div className="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
           {/* Main Tabs */}
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
             <TabsList className="grid w-full grid-cols-2 mb-5 bg-[#1a1f2e] p-1 rounded-lg">
@@ -701,7 +701,7 @@ export default function AI3DInteraction() {
       </div>
 
       {/* Right Panel - 3D Preview Area (2/3) */}
-      <div className="w-2/3 h-full">
+      <div className="basis-2/3 flex-1 relative min-h-0">
         <Model3DViewer
           modelUrl={generatedModelUrl}
           autoRotate={true}
