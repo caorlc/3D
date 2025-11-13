@@ -15,7 +15,7 @@ export const TEXTURE_SHOWCASE_CARDS = [
       {
         id: "texture-1",
         name: "霓虹金属",
-        modelUrl: "/models/ai3d-demo.glb",
+        modelUrl: "/models/ai3d-2.glb",
         gradient: "from-indigo-500 via-purple-500 to-pink-500",
       }
     ],
@@ -30,7 +30,7 @@ export const TEXTURE_SHOWCASE_CARDS = [
       {
         id: "texture-6",
         name: "森林苔藓",
-        modelUrl: "/models/ai3d-demo.glb",
+        modelUrl: "/models/ai3d-2.glb",
         gradient: "from-emerald-500 via-green-500 to-lime-400",
       }
     ],

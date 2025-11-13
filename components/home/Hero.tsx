@@ -13,7 +13,7 @@ import InlineGenerator from "./InlineGenerator";
 
 export default function Hero() {
   const t = useTranslations("Landing.Hero");
-  const defaultModelUrl = "/models/ai3d-demo.glb";
+  const defaultModelUrl = "/models/ai3d-2.glb";
   const [showGenerator, setShowGenerator] = useState(false);
   const [generatedModelUrl, setGeneratedModelUrl] = useState<string | undefined>();
 

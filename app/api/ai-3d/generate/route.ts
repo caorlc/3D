@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
         hasSecretKey: !!tripoSecretKey,
       });
       // Placeholder - use default demo model
-      modelUrl = "https://assets.ai3dmodel.app/pgc/ai3d-demo.glb";
+      modelUrl = "/models/ai3d-2.glb";
       modelInfo = {
         faces: 1234,
         vertices: 567,

@@ -21,9 +21,9 @@ import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
 // Preload the default demo GLB and showcase models to reduce first-load issues
-useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-2.glb");
-useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-2.glb");
-useGLTF.preload("https://assets.ai3dmodel.app/pgc/ai3d-2.glb");
+useGLTF.preload("/models/ai3d-2.glb");
+useGLTF.preload("/models/ai3d-2.glb");
+useGLTF.preload("/models/ai3d-2.glb");
 
 interface Model3DViewerProps {
   modelUrl?: string;
@@ -759,7 +759,7 @@ export default function Model3DViewer({
   modelInfo,
   showControls = true,
   onTextureToggle,
-  defaultModelUrl = "/models/ai3d-demo.glb",
+  defaultModelUrl = "/models/ai3d-2.glb",
   generationParams,
   generationStatus = "idle",
 }: Model3DViewerProps) {
@@ -770,17 +770,29 @@ export default function Model3DViewer({
   const [modelLoadError, setModelLoadError] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
   const [isClient, setIsClient] = useState(false);
+  const [isSceneReady, setIsSceneReady] = useState(false);
   const controlsRef = useRef<any>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const isIdle = useIdleTrigger(600);
+
+  // Don't show default model when processing
+  const isDefaultModel = !modelUrl && generationStatus !== "processing";
+  // Only mount heavy model when idle (keep default demo eager to enhance first impression)
+  const allowHeavyMount = isIdle;
 
   // Ensure component only renders on client side to avoid SSR issues
   useEffect(() => {
     setIsClient(true);
   }, []);
 
+  // Reset scene ready when starting a new load
+  useEffect(() => {
+    setIsSceneReady(false);
+  }, [modelUrl, retryKey, isDefaultModel]);
+
   const handleModelBoundsComputed = useCallback(
     (center: THREE.Vector3, radius: number) => {
+      setIsSceneReady(true);
       const controls = controlsRef.current;
       const camera = cameraRef.current;
 
@@ -818,11 +830,6 @@ export default function Model3DViewer({
     },
     []
   );
-
-  // Don't show default model when processing
-  const isDefaultModel = !modelUrl && generationStatus !== "processing";
-  // Only mount heavy model when idle (keep default demo eager to enhance first impression)
-  const allowHeavyMount = isDefaultModel ? true : isIdle;
 
   useEffect(() => {
     setIsAutoRotating(autoRotate);
@@ -1032,7 +1039,7 @@ export default function Model3DViewer({
               gl.toneMappingExposure = 1.0;
             }}
           >
-            <LoadingProgress />
+            {!isSceneReady && <LoadingProgress />}
             <Suspense
               fallback={null}
             >
