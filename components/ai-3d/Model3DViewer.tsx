@@ -1005,10 +1005,10 @@ export default function Model3DViewer({
           <Canvas
             key={retryKey}
             camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 1000 }}
-            dpr={[1, 1.25]}
+            dpr={1}
             frameloop={allowHeavyMount ? "always" : "demand"}
             gl={{
-              antialias: true,
+              antialias: false,
               alpha: false,
               powerPreference: "high-performance",
               failIfMajorPerformanceCaveat: false,
