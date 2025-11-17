@@ -28,6 +28,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
       R2Files: (await import(`./messages/${locale}/Dashboard/Admin/R2Files.json`)).default,
       Prices: (await import(`./messages/${locale}/Dashboard/Admin/Prices.json`)).default,
 
+      // AI Features
+      AI3D: (await import(`./messages/${locale}/AI3D.json`)).default,
+
       // common
       ...common
     }

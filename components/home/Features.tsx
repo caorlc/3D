@@ -1,4 +1,3 @@
-import FeatureBadge from "@/components/shared/FeatureBadge";
 import { ImagePreview } from "@/components/shared/ImagePreview";
 import {
   Carousel,
@@ -7,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Check, ExternalLink } from "lucide-react";
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
@@ -21,18 +20,18 @@ type Feature = {
   images?: string[];
 };
 
-const FeatureCard = ({ feature }: { feature: Feature }) => {
+const FeatureCard = ({ feature, reverse = false }: { feature: Feature; reverse?: boolean }) => {
   return (
     <div key={feature.title} className="w-full py-4">
       <div className="container mx-auto">
         <div className="grid container p-8 grid-cols-1 gap-8 items-center lg:grid-cols-2">
-          <div className="flex gap-10 flex-col">
+          <div className={reverse ? "flex gap-10 flex-col order-2 lg:order-1" : "flex gap-10 flex-col"}>
             <div className="flex gap-4 flex-col">
               <div className="flex gap-2 flex-col">
-                <h3 className="text-3xl lg:text-5xl tracking-tighter max-w-xl text-left font-regular">
+                <h3 className={reverse ? "text-3xl lg:text-5xl tracking-tighter max-w-xl text-right font-regular" : "text-3xl lg:text-5xl tracking-tighter max-w-xl text-left font-regular"}>
                   {feature.title}
                 </h3>
-                <p className="text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left">
+                <p className={reverse ? "text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl text-right" : "text-lg leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left"}>
                   {feature.description}
                 </p>
               </div>
@@ -54,7 +53,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
               ))}
             </div>
           </div>
-          <div className="rounded-lg p-2 border">
+          <div className={reverse ? "rounded-lg p-2 border order-1 lg:order-2" : "rounded-lg p-2 border"}>
             {feature.images && feature.images.length > 1 ? (
               <div className="w-full max-w-full">
                 <Carousel>
@@ -104,11 +103,6 @@ export default function Features() {
     <section id="features" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <FeatureBadge
-            label={t("badge.label")}
-            text={t("badge.text")}
-            className="mb-8"
-          />
           <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
             <span className="title-gradient">{t("title")}</span>
           </h2>
@@ -118,28 +112,12 @@ export default function Features() {
         </div>
 
         <div className="">
-          {features.map((feature) => (
-            <FeatureCard key={feature.title} feature={feature} />
-          ))}
+          {features.slice(0, 3).map((feature, index) => {
+            const reverse = index % 2 === 1;
+            return <FeatureCard key={feature.title} feature={feature} reverse={reverse} />;
+          })}
         </div>
 
-        <div className="text-center mt-12 py-8 bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
-          <h3 className="text-xl font-semibold mb-3 text-primary">
-            {t("moreFeatures.title")}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-5 max-w-xl mx-auto text-sm">
-            {t("moreFeatures.description")}
-          </p>
-          <a
-            href="https://nexty.dev/roadmap"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="highlight-button inline-flex items-center"
-          >
-            {t("moreFeatures.button")}
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </a>
-        </div>
       </div>
     </section>
   );
