@@ -25,7 +25,7 @@ const FeatureCard = ({ feature, reverse = false }: { feature: Feature; reverse?:
     <div key={feature.title} className="w-full py-4">
       <div className="container mx-auto">
         <div className="grid container p-8 grid-cols-1 gap-8 items-center lg:grid-cols-2">
-          <div className={reverse ? "flex gap-10 flex-col order-2 lg:order-1" : "flex gap-10 flex-col"}>
+          <div className={reverse ? "flex gap-10 flex-col order-2 lg:order-2" : "flex gap-10 flex-col"}>
             <div className="flex gap-4 flex-col">
               <div className="flex gap-2 flex-col">
                 <h3 className={reverse ? "text-3xl lg:text-5xl tracking-tighter max-w-xl text-right font-regular" : "text-3xl lg:text-5xl tracking-tighter max-w-xl text-left font-regular"}>
@@ -53,7 +53,7 @@ const FeatureCard = ({ feature, reverse = false }: { feature: Feature; reverse?:
               ))}
             </div>
           </div>
-          <div className={reverse ? "rounded-lg p-2 border order-1 lg:order-2" : "rounded-lg p-2 border"}>
+          <div className={reverse ? "rounded-lg p-2 border order-1 lg:order-1" : "rounded-lg p-2 border"}>
             {feature.images && feature.images.length > 1 ? (
               <div className="w-full max-w-full">
                 <Carousel>

@@ -118,8 +118,8 @@
     }
   },
   "Home": {
-    "title": "Nexty.dev",
-    "tagLine": "A Modern Next.js Full-Stack SaaS Template",
+    "title": "AI 3D Model",
+    "tagLine": "",
     "description": "A production-ready Next.js and Supabase starter template for building modern SaaS applications. Launch your content, AI, or subscription service faster."
   },
   "Login": {

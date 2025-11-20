@@ -5,8 +5,8 @@
       "text": "Leading Free AI 3D Model Generator - 1536³ Ultra-High Resolution",
       "href": "/ai-3d"
     },
-    "title": "AI 3D Model Generator | Transform Images to 3D Models in 3 Minutes",
-    "description": "Generate production-ready 3D models from text or images using AI 3D Model's free AI 3D generator. Industry-leading 1536³ resolution (50% more detail than competitors). No 3D modeling experience required. Start creating in seconds.",
+    "title": "AI 3D Model Generator | Transform your idea into3D Models in seconds",
+    "description": "Turn text and images into production-ready 3D models in seconds with our free AI-powered generator — perfect for 3D artists, game developers, and creators.",
     "getStarted": "Try Free - No Credit Card",
     "getStartedLink": "/ai-3d",
     "viewDocs": "View API Docs",
@@ -18,8 +18,8 @@
       "label": "FEATURES",
       "text": "Why AI 3D Model is a Leading Free AI 3D Model Generator"
     },
-    "title": "Superior AI 3D Generation - Create Professional Models Without Modeling Skills",
-    "description": "AI 3D Model's free AI 3D model generator combines cutting-edge reconstruction algorithms with 1536³ ultra-high resolution. Transform text descriptions or single images into production-ready 3D assets in minutes. Perfect for game developers, product designers, and 3D printing enthusiasts. Export to GLB, OBJ, STL, FBX, and more.",
+    "title": "Generate Professional Models in ONE CLICK, without any skills.",
+    "description": "Transform text descriptions or single images into production-ready 3D assets in seconds. Perfect for game developers, product designers, and 3D printing enthusiasts. ",
     "moreFeatures": {
       "title": "Explore More AI Features",
       "description": "Discover our complete AI 3D generation features, detailed API documentation, and upcoming enhancements for professional 3D workflows.",
@@ -27,8 +27,8 @@
     },
     "items": [
       {
-        "title": "Text to 3D - AI-Powered Model Creation",
-        "description": "Create 3D models from text descriptions using advanced AI. Simply describe what you want, and our AI 3D generator transforms your words into detailed 3D assets. No modeling skills required.",
+        "title": "Text to 3D Model",
+        "description": "Simply describe what you want, and our AI 3D generator transforms your words into detailed 3D assets. Export to GLB, OBJ, STL, FBX, and more.",
         "details": [
           {
             "title": "Natural Language Processing",
@@ -48,20 +48,20 @@
         ]
       },
       {
-        "title": "Image to 3D - Core AI Feature",
-        "description": "Upload a single image and generate high-precision 3D models in 3 minutes. Our AI 3D model generator supports 1536³ ultra-high resolution with exceptional detail. Perfect for converting product photos, concept art, or reference images into production-ready 3D assets.",
+        "title": "Image to 3D Model",
+        "description": "Transform your 2D images, sketches, or illustrations into stunning 3D models easily. Perfect for converting product photos, concept art into stunning 3D models.",
         "details": [
           {
-            "title": "1536³ Ultra-High Resolution",
-            "description": "50% higher precision than standard AI 3D generators (1024³). Generate models with unmatched detail and accuracy."
+            "title": "Easy to Use",
+            "description": "Generate high-quality 3D models with a single upload. No complex setup, no technical skills required."
           },
           {
-            "title": "3-Minute Fast Generation",
-            "description": "Create complex 3D models in 3 minutes that traditionally require 4-5 days from professional modelers. Game-changing speed for your workflow."
+            "title": "Fast Generation",
+            "description": "Turn a single image into a complete 3D model in just seconds—work that typically takes professionals 4–5 days."
           },
           {
-            "title": "Single Image AI Reconstruction",
-            "description": "Upload just one image and our AI automatically reconstructs a complete 3D model. No need for multi-angle photos or 3D scanning equipment."
+            "title": "Precise 3D Output",
+            "description": "Powered by an advanced high-resolution reconstruction engine, our system delivers sharper details, cleaner topology, and more accurate textures"
           }
         ],
         "images": [
@@ -69,20 +69,20 @@
         ]
       },
       {
-        "title": "Multi-Image to 3D - Enhanced Accuracy",
-        "description": "Upload multiple images from different angles for even more accurate 3D reconstruction. Our AI 3D generator intelligently combines multiple perspectives to create highly detailed models with superior geometry.",
+        "title": "Multi-view Image to 3D Model",
+        "description": "Upload multiple views of your character and generate a more accurate, high-fidelity 3D model that matches your vision.",
         "details": [
           {
-            "title": "Multi-Angle Reconstruction",
-            "description": "Combine 2-4 images from different viewpoints for enhanced 3D model accuracy and detail coverage."
+            "title": "Multi-Angle Input",
+            "description": "Upload 2–4 images from different viewpoints to build a more complete and accurate representation of your character or object."
           },
           {
-            "title": "Intelligent Perspective Fusion",
-            "description": "AI automatically aligns and fuses multiple images to create seamless, production-ready 3D models."
+            "title": "Smart View Fusion",
+            "description": "AI intelligently aligns and merges all angles into a single, cohesive 3D model with consistent structure and textures."
           },
           {
-            "title": "Superior Geometry Quality",
-            "description": "Multi-image input generates more accurate topology and reduces reconstruction artifacts for professional results."
+            "title": "Superior Professional Quality",
+            "description": "Multi-view reconstruction delivers cleaner topology, richer details, and fewer artifacts—ideal for professional-grade results."
           }
         ],
         "images": [
@@ -229,16 +229,16 @@
     "description": "Game developers, product designers, and 3D artists love AI 3D Model's AI 3D model generator"
   },
   "FAQ": {
-    "title": "Frequently Asked Questions About Our AI 3D Model Generator",
+    "title": "FAQs About Our AI 3D Model Generator",
     "description": "Everything you need to know about creating 3D models with AI - from beginners to professional workflows",
     "items": [
       {
         "question": "What is an AI 3D model generator and how does it work?",
-        "answer": "An AI 3D model generator uses artificial intelligence to automatically create 3D models from text descriptions or images. AI 3D Model's AI analyzes your input (text prompt or photo) and reconstructs a complete 3D model with geometry, textures, and details. Unlike traditional 3D modeling that requires professional skills and hours of work, our AI generates production-ready models in just 3 minutes."
+        "answer": "AI 3D model generator uses artificial intelligence to automatically create 3D models from text descriptions or images. AI 3D Model's AI analyzes your input (text prompt or photo) and reconstructs a complete 3D model with geometry, textures, and details. Unlike traditional 3D modeling that requires professional skills and hours of work, our AI generates production-ready models in just 3 minutes."
       },
       {
         "question": "Is AI 3D Model really a free AI 3D model generator?",
-        "answer": "Yes! AI 3D Model offers a free tier that lets you generate 3D models without any credit card required. Free users get access to our core features including text-to-3D, image-to-3D, and 1536³ resolution generation. You can export models in multiple formats (GLB, OBJ, STL) and try the platform risk-free. Premium plans offer additional features like batch processing, API access, and priority generation."
+        "answer": "Yes! AI 3D Model offers a free tier that lets you generate 3D models without any credit card required. Free users get access to our core features including text-to-3D, image-to-3D. You can export models in multiple formats (GLB, OBJ, STL) and try the platform risk-free."
       },
       {
         "question": "Do I need 3D modeling experience to use this AI generator?",
@@ -269,10 +269,6 @@
         "answer": "Yes! While our AI can generate impressive 3D models from just a single image, you can upload 2-4 images from different angles for enhanced accuracy. Multi-image input significantly improves geometry quality and detail coverage, especially for complex objects. The AI automatically aligns and fuses perspectives to create superior 3D reconstructions."
       },
       {
-        "question": "What is 1536³ resolution and why does it matter?",
-        "answer": "Resolution in 3D generation refers to the voxel grid density used during model creation. Our 1536³ resolution means we use a 1536×1536×1536 voxel grid, compared to the industry standard of 1024³. This gives 50% more spatial detail, resulting in sharper edges, finer textures, and more accurate geometry. Higher resolution = better quality 3D models that look more realistic and professional."
-      },
-      {
         "question": "Can I generate low-poly models for game development?",
         "answer": "Absolutely! AI 3D Model includes smart low-poly optimization that automatically reduces polygon count while preserving visual quality. Our AI creates game-ready models optimized for real-time rendering in Unity, Unreal Engine, and web applications. You can specify target polygon count or let our AI determine optimal settings. Perfect for mobile games and performance-critical applications."
       },
@@ -295,8 +291,8 @@
     ]
   },
   "CTA": {
-    "title": "Start Creating 3D Models with AI - Free, No Credit Card Required",
-    "description": "Join thousands of game developers, designers, and 3D artists using AI 3D Model's AI 3D model generator. Generate production-ready models in 3 minutes. 1536³ resolution. Export to any format. Try free today.",
+    "title": "Start Creating 3D Models with AI",
+    "description": "Join thousands of game developers, designers, and 3D artists using AI 3D Model's AI 3D model generator. Generate production-ready models right now.",
     "button": "Try Free AI 3D Generator",
     "trustText": "Trusted by game studios, product designers, and 3D printing professionals in 50+ countries. SOC 2 Type II Certified. GDPR Compliant.",
     "features": {
@@ -309,10 +305,10 @@
   "Pricing": {
     "badge": {
       "label": "PRICING",
-      "text": "Transparent AI 3D Generation Pricing"
+      "text": "Choose your plan"
     },
-    "title": "Free AI 3D Model Generator - Scale as You Grow",
-    "description": "Start generating 3D models for free. Upgrade to premium plans for advanced features like batch processing, API access, and priority generation. No hidden fees.",
+    "title": "AI 3D Model Generator Pricing",
+    "description": "Start generating 3D models for free. Upgrade to premium plans for more generation and smart low poly advanced features.",
     "annual": "Annual",
     "monthly": "Monthly",
     "onetime": "One-Time",
