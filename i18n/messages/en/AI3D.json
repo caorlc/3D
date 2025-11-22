@@ -26,6 +26,7 @@
   "outputFormat": "Output Model Format",
   "requiredCredits": "Required Credits",
   "availableCredits": "Available",
+  "download": "Download",
   "create": "Create",
   "generating": "Generating...",
   "upgradeProRequired": "Upgrade to Pro required for this feature",

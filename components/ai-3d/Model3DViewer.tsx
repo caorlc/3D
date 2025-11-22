@@ -9,6 +9,7 @@ import {
   Box,
   Download,
   Grid3x3,
+  Hand,
   Info,
   Lightbulb,
   Moon,
@@ -17,7 +18,6 @@ import {
   Play,
   RefreshCw,
   RotateCcw,
-  Sparkles,
   Square,
   Sun,
   X,
@@ -29,6 +29,7 @@ import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState 
 import * as THREE from "three";
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { GridFloor } from "./GridFloor";
 
 interface Model3DViewerProps {
   modelUrl?: string;
@@ -64,11 +65,11 @@ const MODEL_VIEWER_SCRIPT_URL =
 const MODEL_VIEWER_DEFAULT_THETA = "0deg";
 const MODEL_VIEWER_DEFAULT_PHI = "75deg";
 const MODEL_VIEWER_BASE_RADIUS = 2.5;
-const MIN_VIEWER_ZOOM = 0.5;
-const MAX_VIEWER_ZOOM = 3;
+const MIN_VIEWER_ZOOM = 0.05;
+const MAX_VIEWER_ZOOM = Number.POSITIVE_INFINITY;
 
 type LightingPreset = "studio" | "warm" | "cool";
-type BackgroundMode = "gradient" | "solid" | "transparent";
+type BackgroundMode = "solid" | "grid";
 type MaterialState = {
   color: THREE.Color;
   map: THREE.Texture | null;
@@ -672,13 +673,16 @@ export default function Model3DViewer({
   const controlsRef = useRef<any>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const modelViewerRef = useRef<ModelViewerElement | null>(null);
+  const viewerContainerRef = useRef<HTMLDivElement | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const [optimizationHint, setOptimizationHint] = useState<string | null>(null);
   const [isOptimizationHintVisible, setIsOptimizationHintVisible] = useState(false);
   const [detectedModelSizeMB, setDetectedModelSizeMB] = useState<number | null>(null);
   const [isModelViewerScriptLoaded, setIsModelViewerScriptLoaded] = useState(false);
   const [lightingPreset, setLightingPreset] = useState<LightingPreset>("studio");
-  const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>(transparentBackground ? "transparent" : "gradient");
+  const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>("solid");
   const [viewMode, setViewMode] = useState<"textured" | "white">("textured");
+  const [isScrollZoomLocked, setIsScrollZoomLocked] = useState(false);
 
   const hasFacesInfo = typeof modelInfo?.faces === "number" && Number.isFinite(modelInfo.faces);
   const hasVerticesInfo = typeof modelInfo?.vertices === "number" && Number.isFinite(modelInfo.vertices);
@@ -739,17 +743,23 @@ export default function Model3DViewer({
   const effectiveModelSrc = modelUrl ?? (isDefaultModel ? defaultModelUrl : undefined);
   // Always allow mounting to prevent freezing (removed idle trigger optimization)
   const allowHeavyMount = true;
-  const shouldRenderTransparent = backgroundMode === "transparent" || transparentBackground;
-  const viewerBackgroundStyle = shouldRenderTransparent
-    ? { background: "transparent" }
-    : backgroundMode === "solid"
-      ? { background: "#0b111b" }
-      : { background: "linear-gradient(to bottom, #1a1f2e 0%, #0f1419 50%, #1a1f2e 100%)" };
+  const shouldRenderTransparent = transparentBackground;
+  const viewerBackgroundStyle = useMemo(() => {
+    if (shouldRenderTransparent) {
+      return { background: "transparent" } as const;
+    }
+
+    if (backgroundMode === "grid") {
+      return { background: "#05070c" } as const;
+    }
+
+    return { background: "#0b111b" } as const;
+  }, [backgroundMode, shouldRenderTransparent]);
+  const showPerspectiveGrid = false;
   const initialModelViewerOrbit = `${MODEL_VIEWER_DEFAULT_THETA} ${MODEL_VIEWER_DEFAULT_PHI} ${MODEL_VIEWER_BASE_RADIUS}m`;
   const setModelViewerRef = useCallback((node: ModelViewerElement | null) => {
     modelViewerRef.current = node;
   }, []);
-
   const handleModelLoadFailure = useCallback((message: string) => {
     setModelLoadError(message);
     setIsSceneReady(true);
@@ -918,7 +928,7 @@ export default function Model3DViewer({
       }
 
       const safeRadius = Number.isFinite(radius) && radius > 0 ? radius : 1;
-      const distance = Math.max(safeRadius * 2.4, 3);
+      const distance = Math.max(safeRadius * 1.8, 2.4);
       const newPosition = center.clone().add(direction.multiplyScalar(distance));
 
       camera.position.copy(newPosition);
@@ -996,23 +1006,42 @@ export default function Model3DViewer({
     element.setAttribute("exposure", currentLightingPreset.exposure.toString());
   }, [currentLightingPreset, isModelViewerEngine, isModelViewerScriptLoaded]);
 
-  const handleZoom = (direction: "in" | "out") => {
-    if (isModelViewerEngine && (!isModelViewerScriptLoaded || !modelViewerRef.current)) {
+  const applyZoomDelta = useCallback((delta: number) => {
+    if (delta === 0) {
       return;
     }
+
     setZoom((prev) => {
-      const delta = direction === "in" ? 0.2 : -0.2;
-      const newZoom = clampZoomValue(prev + delta);
-      if (resolvedRenderEngine === "internal" && cameraRef.current) {
-        const currentDistance = cameraRef.current.position.length();
-        const newDistance = direction === "in" ? currentDistance / 1.2 : currentDistance * 1.2;
-        cameraRef.current.position.normalize().multiplyScalar(newDistance);
-      } else if (resolvedRenderEngine === "model-viewer") {
-        updateModelViewerOrbit(newZoom);
+      const targetZoom = clampZoomValue(prev + delta);
+
+      if (targetZoom === prev) {
+        return prev;
       }
-      return newZoom;
+
+      if (resolvedRenderEngine === "internal" && cameraRef.current) {
+        const camera = cameraRef.current;
+        const currentDistance = camera.position.length();
+        const ratio = targetZoom / prev;
+
+        if (ratio > 0 && Number.isFinite(ratio) && currentDistance > 0) {
+          const directionVector = camera.position.clone().normalize();
+          const newDistance = currentDistance / ratio;
+          camera.position.copy(directionVector.multiplyScalar(newDistance));
+        }
+      } else if (resolvedRenderEngine === "model-viewer") {
+        if (!isModelViewerScriptLoaded || !modelViewerRef.current) {
+          return prev;
+        }
+        updateModelViewerOrbit(targetZoom);
+      }
+
+      return targetZoom;
     });
-  };
+  }, [clampZoomValue, resolvedRenderEngine, updateModelViewerOrbit, isModelViewerScriptLoaded]);
+
+  const handleZoom = useCallback((direction: "in" | "out") => {
+    applyZoomDelta(direction === "in" ? 0.2 : -0.2);
+  }, [applyZoomDelta]);
 
   const handleZoomIn = () => handleZoom("in");
   const handleZoomOut = () => handleZoom("out");
@@ -1063,12 +1092,90 @@ export default function Model3DViewer({
     setLightingPreset(preset);
   };
 
-  const handleViewerWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    if (!event.ctrlKey) {
-      event.preventDefault();
+  const [isViewerHovered, setIsViewerHovered] = useState(false);
+
+  const handleWheelInteraction = useCallback(
+    (event: WheelEvent | React.WheelEvent<HTMLDivElement>) => {
+      const shouldCapture = isScrollZoomLocked || event.ctrlKey;
+      if (!shouldCapture) {
+        return;
+      }
+
+      if (typeof event.preventDefault === "function") {
+        event.preventDefault();
+      }
+      if (typeof event.stopPropagation === "function") {
+        event.stopPropagation();
+      }
+
+      const nativeEvent = "nativeEvent" in event ? event.nativeEvent : event;
+      if (nativeEvent) {
+        if (typeof nativeEvent.preventDefault === "function") {
+          nativeEvent.preventDefault();
+        }
+        if (typeof nativeEvent.stopImmediatePropagation === "function") {
+          nativeEvent.stopImmediatePropagation();
+        }
+        (nativeEvent as any).returnValue = false;
+      }
+
+      const delta = Math.max(Math.min(-(nativeEvent?.deltaY ?? event.deltaY) / 400, 0.5), -0.5);
+      if (delta !== 0) {
+        applyZoomDelta(delta);
+      }
+    },
+    [applyZoomDelta, isScrollZoomLocked]
+  );
+
+  const handleViewerWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      handleWheelInteraction(event);
+    },
+    [handleWheelInteraction]
+  );
+
+  useEffect(() => {
+    const node = viewerContainerRef.current;
+    if (!node) {
+      return;
     }
-  }, []);
+
+    const handleNativeWheel = (event: WheelEvent) => {
+      handleWheelInteraction(event);
+    };
+
+    node.addEventListener("wheel", handleNativeWheel, { passive: false });
+    return () => {
+      node.removeEventListener("wheel", handleNativeWheel);
+    };
+  }, [handleWheelInteraction]);
+
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    if (!renderer || shouldRenderTransparent) {
+      return;
+    }
+
+    if (backgroundMode === "grid") {
+      renderer.setClearColor(new THREE.Color("#0b111b"), 0);
+    } else {
+      renderer.setClearColor(new THREE.Color("#0b111b"), 1);
+    }
+  }, [backgroundMode, shouldRenderTransparent]);
+
+  useEffect(() => {
+    const handleWindowWheel = (event: WheelEvent) => {
+      if (isViewerHovered && (event.ctrlKey || isScrollZoomLocked)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    window.addEventListener("wheel", handleWindowWheel, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleWindowWheel);
+    };
+  }, [isViewerHovered, isScrollZoomLocked]);
 
   const handleDownloadModel = useCallback(() => {
     if (!modelUrl) return;
@@ -1096,14 +1203,10 @@ export default function Model3DViewer({
 
   return (
     <div
-      className={cn(
-        "relative w-full h-full overflow-hidden",
-        !transparentBackground && "bg-gradient-to-br from-[#1a1f2e] via-[#0f1419] to-[#1a1f2e]",
-        transparentBackground && "bg-transparent",
-        className
-      )}
-      style={transparentBackground ? { background: 'transparent' } : undefined}
+      className={cn("relative w-full h-full overflow-hidden", transparentBackground && "bg-transparent", className)}
+      style={transparentBackground ? { background: "transparent" } : viewerBackgroundStyle}
     >
+      {showPerspectiveGrid && null}
       {/* Model Info Overlay - Top Left */}
       {showInfo && modelInfo && (
         <div className="absolute top-4 left-4 z-10 bg-[#1a1f2e]/90 backdrop-blur-sm rounded-xl p-4 text-xs text-gray-300 space-y-3 min-w-[260px]">
@@ -1219,195 +1322,204 @@ export default function Model3DViewer({
       )}
 
       {/* 3D Viewer Container */}
-      <div className="w-full h-full" onWheel={handleViewerWheel}>
-        {!isClient ? (
-          <div className={cn("w-full h-full flex items-center justify-center", !transparentBackground && "bg-[#0f1419]")}>
-            <div className="text-gray-400 text-sm">加载中...</div>
-          </div>
-        ) : (
-          isModelViewerEngine ? (
-            isModelViewerScriptLoaded ? (
-              effectiveModelSrc ? (
-                <model-viewer
-                  key={`${retryKey}-${effectiveModelSrc}`}
-                  ref={setModelViewerRef as any}
-                  src={effectiveModelSrc}
-                  style={{ width: "100%", height: "100%", ...viewerBackgroundStyle }}
-                  ar
-                  ar-modes="scene-viewer webxr quick-look"
-                  shadow-intensity="1"
-                  exposure="0.9"
-                  touch-action="pan-y"
-                  camera-controls
-                  interaction-prompt="auto"
-                  interaction-policy="always-allow"
-                  autoplay
-                  auto-rotate={isAutoRotating ? true : undefined}
-                  camera-orbit={initialModelViewerOrbit}
-                  environment-image="legacy"
-                  loading="lazy"
-                  reveal={generationStatus === "completed" ? "auto" : "interaction"}
-                  tone-mapping="aces"
-                />
+      <div
+        ref={viewerContainerRef}
+        className="relative z-[1] w-full h-full"
+        style={transparentBackground ? { background: "transparent" } : viewerBackgroundStyle}
+        onMouseEnter={() => setIsViewerHovered(true)}
+        onMouseLeave={() => setIsViewerHovered(false)}
+      >
+        <div className="relative z-[1] h-full">
+          {!isClient ? (
+            <div className={cn("w-full h-full flex items-center justify-center", !transparentBackground && "bg-[#0f1419]")}>
+              <div className="text-gray-400 text-sm">加载中...</div>
+            </div>
+          ) : (
+            isModelViewerEngine ? (
+              isModelViewerScriptLoaded ? (
+                effectiveModelSrc ? (
+                  <model-viewer
+                    key={`${retryKey}-${effectiveModelSrc}`}
+                    ref={setModelViewerRef as any}
+                    src={effectiveModelSrc}
+                    style={{ width: "100%", height: "100%", background: "transparent", position: "relative", zIndex: 1 }}
+                    ar
+                    ar-modes="scene-viewer webxr quick-look"
+                    shadow-intensity="1"
+                    exposure="0.9"
+                    touch-action="pan-y"
+                    camera-controls
+                    interaction-prompt="auto"
+                    interaction-policy="always-allow"
+                    autoplay
+                    auto-rotate={isAutoRotating ? true : undefined}
+                    camera-orbit={initialModelViewerOrbit}
+                    environment-image="legacy"
+                    loading="lazy"
+                    reveal={generationStatus === "completed" ? "auto" : "interaction"}
+                    tone-mapping="aces"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-sm text-gray-400" style={viewerBackgroundStyle}>
+                    暂无可预览模型
+                  </div>
+                )
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm text-gray-400" style={viewerBackgroundStyle}>
-                  暂无可预览模型
+                  正在加载 3D 预览引擎...
                 </div>
               )
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-sm text-gray-400" style={viewerBackgroundStyle}>
-                正在加载 3D 预览引擎...
-              </div>
-            )
-          ) : (
-            <Canvas
-              key={retryKey}
-              camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 1000 }}
-              dpr={1}
-              frameloop="always"
-              gl={{
-                antialias: false,
-                alpha: transparentBackground,
-                powerPreference: "high-performance",
-                failIfMajorPerformanceCaveat: false,
-              }}
-              style={viewerBackgroundStyle}
-              onCreated={({ camera, gl }) => {
-                cameraRef.current = camera as THREE.PerspectiveCamera;
+              <Canvas
+                key={retryKey}
+                camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 1000 }}
+                dpr={1}
+                frameloop="always"
+                gl={{
+                  antialias: false,
+                  alpha: transparentBackground,
+                  powerPreference: "high-performance",
+                  failIfMajorPerformanceCaveat: false,
+                }}
+                style={{ width: "100%", height: "100%", background: "transparent", position: "relative", zIndex: 1 }}
+                onCreated={({ camera, gl }) => {
+                  cameraRef.current = camera as THREE.PerspectiveCamera;
+                  rendererRef.current = gl as THREE.WebGLRenderer;
 
-                // Get canvas element
-                const canvas = gl.domElement;
+                  // Get canvas element
+                  const canvas = gl.domElement;
 
-                // Set transparent background if needed
-                if (transparentBackground) {
-                  gl.setClearColor(0x000000, 0); // Transparent black
-                  // Force canvas background to be transparent
+                  // Set transparent background if needed
+                  if (transparentBackground || backgroundMode === "grid") {
+                    gl.setClearColor(0x000000, 0); // Transparent to show parent background/pattern
+                  } else {
+                    gl.setClearColor(0x0b111b, 1);
+                  }
                   canvas.style.backgroundColor = "transparent";
                   canvas.style.background = "transparent";
                   gl.clear();
-                } else {
-                  gl.setClearColor(0x0f1419, 1); // Default dark background
-                }
 
-                // Listen for WebGL context loss/restoration
-                const handleLost = (e: Event) => {
-                  e.preventDefault();
-                  const webglEvent = e as WebGLContextEvent;
-                  console.warn("WebGL context lost", webglEvent);
+                  // Listen for WebGL context loss/restoration
+                  const handleLost = (e: Event) => {
+                    e.preventDefault();
+                    const webglEvent = e as WebGLContextEvent;
+                    console.warn("WebGL context lost", webglEvent);
 
-                  // Check if it's a memory error by checking the WebGL context
-                  const webglContext = gl.getContext() as WebGLRenderingContext | null;
-                  if (webglContext) {
-                    const glError = webglContext.getError();
-                    // OUT_OF_MEMORY = 0x0505 = 1285, but error code 5 is also common
-                    if (glError === 0x0505 || glError === 5 || (webglEvent as any).statusMessage?.includes("memory")) {
-                      console.error("WebGL OUT_OF_MEMORY error detected");
-                      handleModelLoadFailure("模型文件过大导致 GPU 内存不足，请尝试使用更小的模型或刷新页面");
-                      return;
-                    }
-                  }
-                  setIsWebGLLost(true);
-                };
-                const handleRestored = () => {
-                  console.info("WebGL context restored");
-                  setIsWebGLLost(false);
-                  setModelLoadError(null);
-                };
-                canvas.addEventListener("webglcontextlost", handleLost as EventListener, false);
-                canvas.addEventListener("webglcontextrestored", handleRestored as EventListener, false);
-
-                // Ensure reasonable color pipeline
-                // three r181 supports SRGBColorSpace on WebGLRenderer
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                gl.outputColorSpace = THREE.SRGBColorSpace;
-                gl.toneMapping = THREE.ACESFilmicToneMapping;
-                gl.toneMappingExposure = 1.0;
-              }}
-            >
-              {!isSceneReady && !modelLoadError && !isWebGLLost && <LoadingProgress transparentBackground={transparentBackground} />}
-              <Suspense fallback={null}>
-                <ambientLight intensity={currentLightingPreset.ambientIntensity} color={currentLightingPreset.ambientColor} />
-                <directionalLight
-                  position={currentLightingPreset.keyLight.position}
-                  intensity={currentLightingPreset.keyLight.intensity}
-                  color={currentLightingPreset.keyLight.color}
-                />
-                <directionalLight
-                  position={currentLightingPreset.fillLight.position}
-                  intensity={currentLightingPreset.fillLight.intensity}
-                  color={currentLightingPreset.fillLight.color}
-                />
-                <directionalLight
-                  position={currentLightingPreset.rimLight.position}
-                  intensity={currentLightingPreset.rimLight.intensity}
-                  color={currentLightingPreset.rimLight.color}
-                />
-                <pointLight position={[0, 10, 0]} intensity={0.35} />
-
-                {isDefaultModel ? (
-                  <DefaultModelWithFile
-                    autoRotate={isAutoRotating}
-                    defaultModelUrl={defaultModelUrl}
-                    onBoundsComputed={handleModelBoundsComputed}
-                    modelScaleFactor={modelScaleFactor}
-                  />
-                ) : modelUrl ? (
-                  <ModelErrorBoundary
-                    fallback={
-                      <mesh>
-                        <boxGeometry args={[1, 1, 1]} />
-                        <meshStandardMaterial color="#ff0000" />
-                      </mesh>
-                    }
-                    onError={(error) => {
-                      console.error("[Model3DViewer] Model loading error:", error);
-                      const errorMsg = error.message || error.toString();
-
-                      if (errorMsg?.includes("timeout") || errorMsg?.includes("Failed to fetch")) {
-                        handleModelLoadFailure("模型文件过大或网络连接超时，请稍后重试");
-                      } else if (errorMsg?.includes("CORS") || errorMsg?.includes("cross-origin")) {
-                        handleModelLoadFailure("跨域访问被阻止，请联系管理员");
-                      } else if (
-                        errorMsg?.includes("memory") ||
-                        errorMsg?.includes("Memory") ||
-                        errorMsg?.includes("OUT_OF_MEMORY") ||
-                        errorMsg?.includes("错误代码：5") ||
-                        (error as any).code === 5
-                      ) {
-                        handleModelLoadFailure("模型文件过大导致内存不足，请尝试使用更小的模型或刷新页面");
-                      } else if (errorMsg?.includes("WebGL") || errorMsg?.includes("webgl")) {
-                        handleModelLoadFailure("WebGL 渲染错误，请检查浏览器是否支持 WebGL 或刷新页面");
-                      } else {
-                        handleModelLoadFailure("模型加载失败，请检查文件格式或重试。如果问题持续，可能是模型文件过大");
+                    // Check if it's a memory error by checking the WebGL context
+                    const webglContext = gl.getContext() as WebGLRenderingContext | null;
+                    if (webglContext) {
+                      const glError = webglContext.getError();
+                      // OUT_OF_MEMORY = 0x0505 = 1285, but error code 5 is also common
+                      if (glError === 0x0505 || glError === 5 || (webglEvent as any).statusMessage?.includes("memory")) {
+                        console.error("WebGL OUT_OF_MEMORY error detected");
+                        handleModelLoadFailure("模型文件过大导致 GPU 内存不足，请尝试使用更小的模型或刷新页面");
+                        return;
                       }
-                    }}
-                  >
-                    <Model
-                      url={modelUrl}
+                    }
+                    setIsWebGLLost(true);
+                  };
+                  const handleRestored = () => {
+                    console.info("WebGL context restored");
+                    setIsWebGLLost(false);
+                    setModelLoadError(null);
+                  };
+                  canvas.addEventListener("webglcontextlost", handleLost as EventListener, false);
+                  canvas.addEventListener("webglcontextrestored", handleRestored as EventListener, false);
+
+                  // Ensure reasonable color pipeline
+                  // three r181 supports SRGBColorSpace on WebGLRenderer
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  gl.outputColorSpace = THREE.SRGBColorSpace;
+                  gl.toneMapping = THREE.ACESFilmicToneMapping;
+                  gl.toneMappingExposure = 1.0;
+                }}
+              >
+                {!isSceneReady && !modelLoadError && !isWebGLLost && <LoadingProgress transparentBackground={transparentBackground} />}
+                <Suspense fallback={null}>
+                  <GridFloor visible={backgroundMode === "grid"} transparentBackground={transparentBackground} />
+                  <ambientLight intensity={currentLightingPreset.ambientIntensity} color={currentLightingPreset.ambientColor} />
+                  <directionalLight
+                    position={currentLightingPreset.keyLight.position}
+                    intensity={currentLightingPreset.keyLight.intensity}
+                    color={currentLightingPreset.keyLight.color}
+                  />
+                  <directionalLight
+                    position={currentLightingPreset.fillLight.position}
+                    intensity={currentLightingPreset.fillLight.intensity}
+                    color={currentLightingPreset.fillLight.color}
+                  />
+                  <directionalLight
+                    position={currentLightingPreset.rimLight.position}
+                    intensity={currentLightingPreset.rimLight.intensity}
+                    color={currentLightingPreset.rimLight.color}
+                  />
+                  <pointLight position={[0, 10, 0]} intensity={0.35} />
+
+                  {isDefaultModel ? (
+                    <DefaultModelWithFile
                       autoRotate={isAutoRotating}
-                      showTexture={showTexture}
+                      defaultModelUrl={defaultModelUrl}
                       onBoundsComputed={handleModelBoundsComputed}
                       modelScaleFactor={modelScaleFactor}
                     />
-                  </ModelErrorBoundary>
-                ) : null}
+                  ) : modelUrl ? (
+                    <ModelErrorBoundary
+                      fallback={
+                        <mesh>
+                          <boxGeometry args={[1, 1, 1]} />
+                          <meshStandardMaterial color="#ff0000" />
+                        </mesh>
+                      }
+                      onError={(error) => {
+                        console.error("[Model3DViewer] Model loading error:", error);
+                        const errorMsg = error.message || error.toString();
 
-                <OrbitControls
-                  ref={controlsRef}
-                  enableZoom={enableZoom}
-                  enablePan={true}
-                  enableRotate={true}
-                  autoRotate={isAutoRotating}
-                  autoRotateSpeed={1}
-                  minDistance={1.5}
-                  maxDistance={15}
-                  target={[0, 0, 0]}
-                />
-              </Suspense>
-            </Canvas>
-          )
-        )}
+                        if (errorMsg?.includes("timeout") || errorMsg?.includes("Failed to fetch")) {
+                          handleModelLoadFailure("模型文件过大或网络连接超时，请稍后重试");
+                        } else if (errorMsg?.includes("CORS") || errorMsg?.includes("cross-origin")) {
+                          handleModelLoadFailure("跨域访问被阻止，请联系管理员");
+                        } else if (
+                          errorMsg?.includes("memory") ||
+                          errorMsg?.includes("Memory") ||
+                          errorMsg?.includes("OUT_OF_MEMORY") ||
+                          errorMsg?.includes("错误代码：5") ||
+                          (error as any).code === 5
+                        ) {
+                          handleModelLoadFailure("模型文件过大导致内存不足，请尝试使用更小的模型或刷新页面");
+                        } else if (errorMsg?.includes("WebGL") || errorMsg?.includes("webgl")) {
+                          handleModelLoadFailure("WebGL 渲染错误，请检查浏览器是否支持 WebGL 或刷新页面");
+                        } else {
+                          handleModelLoadFailure("模型加载失败，请检查文件格式或重试。如果问题持续，可能是模型文件过大");
+                        }
+                      }}
+                    >
+                      <Model
+                        url={modelUrl}
+                        autoRotate={isAutoRotating}
+                        showTexture={showTexture}
+                        onBoundsComputed={handleModelBoundsComputed}
+                        modelScaleFactor={modelScaleFactor}
+                      />
+                    </ModelErrorBoundary>
+                  ) : null}
+
+                  <OrbitControls
+                    ref={controlsRef}
+                    enableZoom={enableZoom}
+                    enablePan={enableZoom}
+                    enableRotate={enableZoom}
+                    autoRotate={isAutoRotating}
+                    autoRotateSpeed={1}
+                    minDistance={0.05}
+                    maxDistance={Number.MAX_VALUE}
+                    target={[0, 0, 0]}
+                  />
+                </Suspense>
+              </Canvas>
+            )
+          )}
+        </div>
       </div>
 
       {/* Controls - Bottom */}
@@ -1436,6 +1548,20 @@ export default function Model3DViewer({
                 title="放大"
               >
                 <ZoomIn className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "h-8 w-8",
+                  isScrollZoomLocked
+                    ? "text-white bg-purple-500/20 hover:bg-purple-500/30"
+                    : "text-gray-400 hover:text-white"
+                )}
+                onClick={() => setIsScrollZoomLocked((prev) => !prev)}
+                title={isScrollZoomLocked ? "关闭滚轮缩放" : "开启滚轮缩放"}
+              >
+                <Hand className="h-4 w-4" />
               </Button>
             </div>
 
@@ -1563,24 +1689,12 @@ export default function Model3DViewer({
                 size="icon"
                 className={cn(
                   "h-8 w-8",
-                  backgroundMode === "gradient" ? "text-white bg-white/10" : "text-gray-400 hover:text-white"
+                  backgroundMode === "grid" ? "text-white bg-white/10" : "text-gray-400 hover:text-white"
                 )}
-                onClick={() => handleBackgroundChange("gradient")}
-                title="渐变背景"
+                onClick={() => handleBackgroundChange("grid")}
+                title="网格背景"
               >
                 <Grid3x3 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-8 w-8",
-                  backgroundMode === "transparent" ? "text-white bg-white/10" : "text-gray-400 hover:text-white"
-                )}
-                onClick={() => handleBackgroundChange("transparent")}
-                title="透明背景"
-              >
-                <Sparkles className="h-4 w-4" />
               </Button>
             </div>
 

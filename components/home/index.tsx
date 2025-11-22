@@ -1,3 +1,4 @@
+import { getPublicPricingPlans } from "@/actions/prices/public";
 import AI3DInteraction from "@/components/ai-3d";
 import CTA from "@/components/home/CTA";
 import FAQ from "@/components/home/FAQ";
@@ -10,12 +11,16 @@ import { getMessages } from "next-intl/server";
 export default async function HomeComponent() {
   const messages = await getMessages();
 
+  // Fetch pricing plans for AI3DInteraction
+  const pricingResult = await getPublicPricingPlans();
+  const pricingPlans = pricingResult.success ? pricingResult.data : [];
+
   return (
     <div className="w-full">
       <BG1 />
 
       {/* First section: Full AI 3D generation area */}
-      <AI3DInteraction />
+      <AI3DInteraction pricingPlans={pricingPlans} />
 
       <ModelGallery />
       {messages.Landing.Features && <Features />}
