@@ -301,7 +301,7 @@
   "ModelGallery": {
     "title": "High-Fidelity Material Synthesis Engine",
     "description": "Professional-grade texture generation powered by cutting-edge AI. Create stunning PBR materials with unmatched surface detail, seamless tiling, and intelligent style transfer—from concept to production-ready asset in seconds.",
-    "downloadButton": "Download Model"
+    "downloadButton": "Download"
   },
   "Pricing": {
     "badge": {

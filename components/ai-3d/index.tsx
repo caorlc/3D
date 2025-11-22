@@ -620,10 +620,22 @@ export default function AI3DInteraction({ pricingPlans = [] }: AI3DInteractionPr
   };
 
   return (
-    <div className="w-full lg:w-4/5 mx-auto bg-[#0f1419] text-white flex flex-col lg:flex-row rounded-3xl border border-[#1f2937] shadow-2xl mb-16">
-      {/* Left Panel - Interaction Area (1/3) */}
-      <div className="basis-full lg:basis-1/3 shrink-0 border-r border-[#1f2937] flex flex-col min-h-[320px] lg:min-h-[520px]">
-        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+    <div className="w-full flex flex-col items-center">
+      {/* Hero Title Section */}
+      <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 text-center mb-12 mt-8">
+        <h1 className="text-center z-10 text-3xl md:text-5xl font-sans font-semibold mb-4">
+          <span className="title-gradient">{t("heroTitle")}</span>
+        </h1>
+        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          {t("heroDescription")}
+        </p>
+      </div>
+
+      {/* Main AI3D Interface */}
+      <div className="w-full lg:w-4/5 mx-auto bg-[#0f1419] text-white flex flex-col lg:flex-row rounded-3xl border border-[#1f2937] shadow-2xl mb-16">
+        {/* Left Panel - Interaction Area (1/3) */}
+        <div className="basis-full lg:basis-1/3 shrink-0 border-r border-[#1f2937] flex flex-col min-h-[320px] lg:min-h-[520px]">
+          <div className="p-6 space-y-5 overflow-y-auto flex-1">
           {/* Main Tabs */}
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
             <TabsList className="grid w-full grid-cols-2 mb-5 bg-[#1a1f2e] p-1 rounded-lg">
@@ -891,11 +903,12 @@ export default function AI3DInteraction({ pricingPlans = [] }: AI3DInteractionPr
 
       </div>
 
-      <PricingDialog
-        open={isPricingDialogOpen}
-        onOpenChange={setIsPricingDialogOpen}
-        pricingPlans={pricingPlans}
-      />
+        <PricingDialog
+          open={isPricingDialogOpen}
+          onOpenChange={setIsPricingDialogOpen}
+          pricingPlans={pricingPlans}
+        />
+      </div>
     </div>
   );
 }

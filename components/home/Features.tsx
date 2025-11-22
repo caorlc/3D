@@ -102,15 +102,6 @@ export default function Features() {
   return (
     <section id="features" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8">
-          <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
-            <span className="title-gradient">{t("title")}</span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            {t("description")}
-          </p>
-        </div>
-
         <div className="">
           {features.slice(0, 3).map((feature, index) => {
             const reverse = index % 2 === 1;

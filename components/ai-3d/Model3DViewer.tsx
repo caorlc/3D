@@ -9,7 +9,6 @@ import {
   Box,
   Download,
   Grid3x3,
-  Hand,
   Info,
   Lightbulb,
   Moon,
@@ -683,7 +682,6 @@ export default function Model3DViewer({
   const [lightingPreset, setLightingPreset] = useState<LightingPreset>("studio");
   const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>("solid");
   const [viewMode, setViewMode] = useState<"textured" | "white">("textured");
-  const [isScrollZoomLocked, setIsScrollZoomLocked] = useState(false);
 
   const hasFacesInfo = typeof modelInfo?.faces === "number" && Number.isFinite(modelInfo.faces);
   const hasVerticesInfo = typeof modelInfo?.vertices === "number" && Number.isFinite(modelInfo.vertices);
@@ -1097,26 +1095,29 @@ export default function Model3DViewer({
 
   const handleWheelInteraction = useCallback(
     (event: WheelEvent | React.WheelEvent<HTMLDivElement>) => {
-      const shouldCapture = isScrollZoomLocked || event.ctrlKey;
-      if (!shouldCapture) {
-        return;
-      }
-
-      if (typeof event.preventDefault === "function") {
-        event.preventDefault();
-      }
+      // 总是阻止事件传播到 OrbitControls
       if (typeof event.stopPropagation === "function") {
         event.stopPropagation();
       }
 
       const nativeEvent = "nativeEvent" in event ? event.nativeEvent : event;
-      if (nativeEvent) {
-        if (typeof nativeEvent.preventDefault === "function") {
-          nativeEvent.preventDefault();
-        }
-        if (typeof nativeEvent.stopImmediatePropagation === "function") {
-          nativeEvent.stopImmediatePropagation();
-        }
+      if (nativeEvent && typeof nativeEvent.stopImmediatePropagation === "function") {
+        nativeEvent.stopImmediatePropagation();
+      }
+
+      // 只有按下 Ctrl 键时才缩放模型
+      const shouldZoom = event.ctrlKey;
+      if (!shouldZoom) {
+        // 不缩放：允许页面正常滚动（不调用 preventDefault）
+        return;
+      }
+
+      // 需要缩放：阻止页面滚动
+      if (typeof event.preventDefault === "function") {
+        event.preventDefault();
+      }
+      if (nativeEvent && typeof nativeEvent.preventDefault === "function") {
+        nativeEvent.preventDefault();
         (nativeEvent as any).returnValue = false;
       }
 
@@ -1125,7 +1126,7 @@ export default function Model3DViewer({
         applyZoomDelta(delta);
       }
     },
-    [applyZoomDelta, isScrollZoomLocked]
+    [applyZoomDelta]
   );
 
   const handleViewerWheel = useCallback(
@@ -1166,7 +1167,7 @@ export default function Model3DViewer({
 
   useEffect(() => {
     const handleWindowWheel = (event: WheelEvent) => {
-      if (isViewerHovered && (event.ctrlKey || isScrollZoomLocked)) {
+      if (isViewerHovered && event.ctrlKey) {
         event.preventDefault();
         event.stopPropagation();
       }
@@ -1176,7 +1177,7 @@ export default function Model3DViewer({
     return () => {
       window.removeEventListener("wheel", handleWindowWheel);
     };
-  }, [isViewerHovered, isScrollZoomLocked]);
+  }, [isViewerHovered]);
 
   const handleDownloadModel = useCallback(() => {
     if (!modelUrl) return;
@@ -1449,7 +1450,7 @@ export default function Model3DViewer({
               />
               <pointLight position={[0, 10, 0]} intensity={0.35} />
 
-              {isDefaultModel ? (
+              {isDefaultModel && defaultModelUrl ? (
                 <DefaultModelWithFile
                   autoRotate={isAutoRotating}
                   defaultModelUrl={defaultModelUrl}
@@ -1540,20 +1541,6 @@ export default function Model3DViewer({
                 title="放大"
               >
                 <ZoomIn className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-8 w-8",
-                  isScrollZoomLocked
-                    ? "text-white bg-purple-500/20 hover:bg-purple-500/30"
-                    : "text-gray-400 hover:text-white"
-                )}
-                onClick={() => setIsScrollZoomLocked((prev) => !prev)}
-                title={isScrollZoomLocked ? "关闭滚轮缩放" : "开启滚轮缩放"}
-              >
-                <Hand className="h-4 w-4" />
               </Button>
             </div>
 

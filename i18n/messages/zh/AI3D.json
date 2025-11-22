@@ -1,6 +1,8 @@
 {
   "title": "AI 3D 交互",
   "metaDescription": "使用先进的AI技术从文本描述或图像生成3D模型",
+  "heroTitle": "一键生成专业模型，无需任何技能",
+  "heroDescription": "在几秒钟内将文字描述或单张图片转换为可用于生产的3D资产。非常适合游戏开发者、产品设计师和3D打印爱好者。",
   "textTo3D": "文生3D",
   "imageTo3D": "图生3D",
   "promptPlaceholder": "描述你想要创建的3D模型...",
