@@ -1,7 +1,6 @@
 "use client";
 
 import LocaleSwitcher from "@/components/LocaleSwitcher";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,9 +104,8 @@ export default function MobileMenu() {
           )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-center justify-end px-1">
           <LocaleSwitcher />
-          <ThemeToggle />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

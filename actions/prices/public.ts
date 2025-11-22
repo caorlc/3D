@@ -22,14 +22,17 @@ export async function getPublicPricingPlans(): Promise<
   const environment = process.env.NODE_ENV === 'production' ? 'live' : 'test'
 
   try {
+    // In development, show both test and live plans for easier testing
     const plans = await db
       .select()
       .from(pricingPlansSchema)
       .where(
-        and(
-          eq(pricingPlansSchema.environment, environment),
-          eq(pricingPlansSchema.isActive, true)
-        )
+        process.env.NODE_ENV === 'production'
+          ? and(
+            eq(pricingPlansSchema.environment, environment),
+            eq(pricingPlansSchema.isActive, true)
+          )
+          : eq(pricingPlansSchema.isActive, true)
       )
       .orderBy(asc(pricingPlansSchema.displayOrder))
 

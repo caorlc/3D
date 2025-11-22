@@ -13,16 +13,24 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useUserBenefits } from "@/hooks/useUserBenefits";
+import { pricingPlans as pricingPlansSchema } from "@/lib/db/schema";
 import { cn } from "@/lib/utils";
 import { Crown, HelpCircle, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { calculateCredits, type GenerationParams } from "./CreditCalculator";
 import Model3DViewer from "./Model3DViewer";
+import { PricingDialog } from "./PricingDialog";
 import { UploadArea } from "./UploadArea";
 
-export default function AI3DInteraction() {
+type PricingPlan = typeof pricingPlansSchema.$inferSelect;
+
+interface AI3DInteractionProps {
+  pricingPlans?: PricingPlan[];
+}
+
+export default function AI3DInteraction({ pricingPlans = [] }: AI3DInteractionProps) {
   const t = useTranslations("AI3D");
   const { benefits, isLoading: isLoadingBenefits, isError: benefitsError } = useUserBenefits();
   const isPro =
@@ -58,6 +66,18 @@ export default function AI3DInteraction() {
     smartLowPoly?: boolean;
   }>();
   const [hasRestoredModel, setHasRestoredModel] = useState(false);
+  const [viewerResetKey, setViewerResetKey] = useState(0);
+  const [isPricingDialogOpen, setIsPricingDialogOpen] = useState(false);
+
+  const imageSlots = useMemo(
+    () => [
+      { label: t("frontView"), required: true },
+      { label: t("backView"), required: false },
+      { label: t("leftView"), required: false },
+      { label: t("rightView"), required: false },
+    ],
+    [t]
+  );
 
   // Define image slots for multiple image upload
   const imageSlots = [
@@ -71,6 +91,15 @@ export default function AI3DInteraction() {
     setUploadedFiles([]);
     setUploadedPreviews([]);
   }, [imageTab]);
+
+  useEffect(() => {
+    setGeneratedModelUrl(undefined);
+    setGeneratedModelInfo(undefined);
+    setGenerationStatus("idle");
+    setHasRestoredModel(false);
+    setCurrentGenerationParams(undefined);
+    setViewerResetKey((prev) => prev + 1);
+  }, [mainTab]);
 
   const shouldShowViewerInfo = Boolean(
     generatedModelUrl ||
@@ -362,9 +391,37 @@ export default function AI3DInteraction() {
       });
   };
 
+  const promptUpgrade = () => {
+    setIsPricingDialogOpen(true);
+  };
+
+  const handleDownloadModel = useCallback(() => {
+    if (!generatedModelUrl) return;
+
+    const inferFilename = (url: string) => {
+      try {
+        const urlObj = new URL(url, window.location.origin);
+        const pathname = urlObj.pathname;
+        const raw = pathname.substring(pathname.lastIndexOf("/") + 1) || "ai3d-model";
+        return raw.includes(".") ? raw : `${raw}.glb`;
+      } catch {
+        const segments = url.split("/");
+        const fallback = segments[segments.length - 1] || "ai3d-model.glb";
+        return fallback.includes(".") ? fallback : `${fallback}.glb`;
+      }
+    };
+
+    const link = document.createElement("a");
+    link.href = generatedModelUrl;
+    link.download = inferFilename(generatedModelUrl);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [generatedModelUrl]);
+
   const handleSmartLowPolyChange = (checked: boolean) => {
     if (checked && !isPro) {
-      toast.error(t("upgradeProRequired"));
+      promptUpgrade();
       return;
     }
     setSmartLowPoly(checked);
@@ -372,7 +429,7 @@ export default function AI3DInteraction() {
 
   const handlePublicVisibilityChange = (checked: boolean) => {
     if (!checked && !isPro) {
-      toast.error(t("upgradeProRequired"));
+      promptUpgrade();
       setPublicVisibility(true);
       return;
     }
@@ -571,10 +628,10 @@ export default function AI3DInteraction() {
   };
 
   return (
-    <div className="flex-1 w-full h-full bg-[#0f1419] text-white flex flex-col lg:flex-row min-h-0 overflow-x-hidden overflow-y-auto lg:overflow-y-hidden">
+    <div className="w-full lg:w-4/5 mx-auto bg-[#0f1419] text-white flex flex-col lg:flex-row rounded-3xl border border-[#1f2937] shadow-2xl mb-16">
       {/* Left Panel - Interaction Area (1/3) */}
-      <div className="basis-full lg:basis-1/3 shrink-0 border-r border-[#1f2937] flex flex-col min-h-[320px] lg:min-h-0 lg:max-h-full">
-        <div className="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
+      <div className="basis-full lg:basis-1/3 shrink-0 border-r border-[#1f2937] flex flex-col min-h-[320px] lg:min-h-[520px]">
+        <div className="p-6 space-y-5 overflow-y-auto flex-1">
           {/* Main Tabs */}
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)}>
             <TabsList className="grid w-full grid-cols-2 mb-5 bg-[#1a1f2e] p-1 rounded-lg">
@@ -723,9 +780,9 @@ export default function AI3DInteraction() {
             </div>
           </div>
 
-          {/* Smart Low Poly Toggle */}
+          {/* Smart Low Poly & Visibility Toggles */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between py-1">
+            <div className="flex items-center justify-between py-1 gap-4">
               <div className="flex items-center gap-2">
                 <Label
                   htmlFor="smart-low-poly"
@@ -743,7 +800,7 @@ export default function AI3DInteraction() {
             </div>
 
             {/* Public Visibility */}
-            <div className="flex items-center justify-between py-1">
+            <div className="flex items-center justify-between py-1 gap-4">
               <div className="flex items-center gap-2">
                 <Label
                   htmlFor="public-visibility"
@@ -823,15 +880,16 @@ export default function AI3DInteraction() {
       </div>
 
       {/* Right Panel - 3D Preview Area (2/3) */}
-      <div className="basis-full lg:basis-2/3 flex-1 min-h-[360px] lg:min-h-0 flex flex-col">
-        <div className="flex-1 min-h-0 relative">
+      <div className="basis-full lg:basis-2/3 flex-1 min-h-[360px] lg:min-h-[520px] flex flex-col">
+        <div className="flex-1 relative">
           <Model3DViewer
+            key={viewerResetKey}
             modelUrl={generatedModelUrl}
             autoRotate={true}
             showInfo={shouldShowViewerInfo}
             showControls={true}
             modelInfo={generatedModelInfo}
-            generationParams={currentGenerationParams}
+            generationParams={currentGenerationParams ?? generationParams}
             generationStatus={generationStatus}
             className="h-full w-full"
             defaultModelUrl="/models/ai3d-demo.glb"
@@ -840,6 +898,12 @@ export default function AI3DInteraction() {
         </div>
 
       </div>
+
+      <PricingDialog
+        open={isPricingDialogOpen}
+        onOpenChange={setIsPricingDialogOpen}
+        pricingPlans={pricingPlans}
+      />
     </div>
   );
 }
