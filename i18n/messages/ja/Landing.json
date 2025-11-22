@@ -44,7 +44,7 @@
           }
         ],
         "images": [
-          "/images/features/template1.webp"
+          "https://assets.ai3dmodel.app/pgc/text-to-3d.webp"
         ]
       },
       {
@@ -65,7 +65,7 @@
           }
         ],
         "images": [
-          "/images/features/login.png"
+          "https://assets.ai3dmodel.app/pgc/image-to-3d.webp"
         ]
       },
       {
@@ -86,7 +86,7 @@
           }
         ],
         "images": [
-          "/images/features/multi-image.webp"
+          "https://assets.ai3dmodel.app/pgc/multi-image-to-3d.webp"
         ]
       },
       {
@@ -206,18 +206,6 @@
         "description": "製品写真をECサイト向けインタラクティブ3Dモデルに変換。AI 3Dモデル生成ツールがリアルタイムプレビュー付きWeb最適化モデルを作成。没入型360°製品ビューでコンバージョン率を向上。",
         "image": "/placeholder.webp",
         "icon": "Monitor"
-      },
-      {
-        "title": "AR/VR開発",
-        "description": "拡張現実および仮想現実アプリケーション向けに最適化された3Dモデルを生成。AIがARKit、ARCore、WebXR標準と互換性のあるパフォーマンス最適化アセットを作成。",
-        "image": "/placeholder.webp",
-        "icon": "Glasses"
-      },
-      {
-        "title": "教育・トレーニング",
-        "description": "モデリングスキルなしで3D教育コンテンツを作成。歴史的遺物、科学的概念、教材をインタラクティブな3Dモデルに変換し、学習体験を向上。",
-        "image": "/placeholder.webp",
-        "icon": "GraduationCap"
       }
     ]
   },
@@ -226,7 +214,33 @@
       "label": "お客様の声"
     },
     "title": "世界中の3Dプロフェッショナルに信頼される",
-    "description": "ゲーム開発者、プロダクトデザイナー、3DアーティストがAI 3D ModelのAI 3Dモデル生成ツールを愛用"
+    "description": "ゲーム開発者、プロダクトデザイナー、3DアーティストがAI 3D ModelのAI 3Dモデル生成ツールを愛用",
+    "items": [
+      {
+        "content": "AI 3D Modelのおかげで、わずか2日間で3D製品カタログをローンチできました。画像から3D機能は驚異的で、100枚以上の製品写真をインタラクティブな3Dモデルに変換しました。360°製品ビューを追加してからコンバージョン率が45%向上しました。",
+        "author": {
+          "name": "田中 太郎",
+          "position": "インディー開発者"
+        },
+        "rating": 5.0
+      },
+      {
+        "content": "技術リソースが限られているプロダクトマネージャーとして、AI 3D Modelは画期的でした。リアルタイムプレビュー付きの3Dビジュアライゼーション機能を4週間ではなく3日間で構築・ローンチできました。ドキュメントも非常に充実しています。",
+        "author": {
+          "name": "佐藤 花子",
+          "position": "最高技術責任者"
+        },
+        "rating": 4.8
+      },
+      {
+        "content": "多視点再構築機能は素晴らしいです。ゲームキャラクターパイプラインに使用し、アセット作成時間を80%削減できました。品質はアーティストが手動で作成したものと同等ですが、所要時間はわずかです。",
+        "author": {
+          "name": "鈴木 一郎",
+          "position": "ゲーム開発者"
+        },
+        "rating": 5.0
+      }
+    ]
   },
   "FAQ": {
     "title": "AI 3Dモデル生成に関するよくある質問",

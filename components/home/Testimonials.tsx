@@ -8,43 +8,9 @@ type Testimonial = {
   author: {
     name: string;
     position: string;
-    avatar: string;
   };
   rating: number;
 };
-
-const testimonials: Testimonial[] = [
-  {
-    content:
-      "Nexty helped us launch our AI content generator in just 1 day. The authentication, payment integration, and AI capabilities were ready out of the box, saving us at least 2 weeks of development time.",
-    author: {
-      name: "Michael Chen",
-      position: "Indie Maker",
-      avatar: "/images/users/user1.jpeg",
-    },
-    rating: 5.0,
-  },
-  {
-    content:
-      "As a product manager with limited technical resources, Nexty was a game-changer. We built and launched our analytics dashboard with subscription tiers in 3 days instead of 4 weeks. The documentation is exceptional.",
-    author: {
-      name: "Sarah Johnson",
-      position: "CTO",
-      avatar: "/images/users/user2.jpeg",
-    },
-    rating: 4.8,
-  },
-  {
-    content:
-      "我们团队使用 Nexty 开发了一个订阅制 AI 工具 SaaS 平台，第一个版本的开发仅用了 1天时间。内置的多语言支持和 SEO 友好的页面结构帮助我们迅速获得用户认可，投资回报率超出预期。",
-    author: {
-      name: "Kang",
-      position: "Product Manager",
-      avatar: "/images/users/user3.png",
-    },
-    rating: 5.0,
-  },
-];
 
 const RatingStars = ({ rating }: { rating: number }) => {
   const fullStars = Math.floor(rating);
@@ -65,6 +31,15 @@ const RatingStars = ({ rating }: { rating: number }) => {
 
 export default function Testimonials() {
   const t = useTranslations("Landing.Testimonials");
+
+  const testimonials: Testimonial[] = t.raw("items").map((item: Testimonial) => ({
+    content: item.content,
+    author: {
+      name: item.author.name,
+      position: item.author.position,
+    },
+    rating: item.rating,
+  }));
 
   return (
     <section id="testimonials" className="py-20">
@@ -96,23 +71,12 @@ export default function Testimonials() {
                     <RatingStars rating={testimonial.rating} />
                     <p className="text-foreground">{testimonial.content}</p>
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center">
-                        <img
-                          src={testimonial.author.avatar}
-                          alt={testimonial.author.name}
-                          width={48}
-                          height={48}
-                          className="rounded-full"
-                        />
-                      </div>
-                      <div className="ml-3">
-                        <p className="font-medium">
-                          {testimonial.author.name},{" "}
-                          <span className="">
-                            {testimonial.author.position}
-                          </span>
-                        </p>
-                      </div>
+                      <p className="font-medium">
+                        {testimonial.author.name},{" "}
+                        <span className="">
+                          {testimonial.author.position}
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -5,6 +5,8 @@ import FAQ from "@/components/home/FAQ";
 import Features from "@/components/home/Features";
 import ModelGallery from "@/components/home/ModelGallery";
 import Pricing from "@/components/home/Pricing";
+import Testimonials from "@/components/home/Testimonials";
+import UseCases from "@/components/home/UseCases";
 import { BG1 } from "@/components/shared/BGs";
 import { getMessages } from "next-intl/server";
 
@@ -25,7 +27,11 @@ export default async function HomeComponent() {
       <ModelGallery />
       {messages.Landing.Features && <Features />}
 
+      {messages.Landing.UseCases && <UseCases />}
+
       <Pricing />
+
+      {messages.Landing.Testimonials && <Testimonials />}
 
       {messages.Landing.FAQ && <FAQ />}
 

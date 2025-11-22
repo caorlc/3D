@@ -44,7 +44,7 @@
           }
         ],
         "images": [
-          "/images/features/template1.webp"
+          "https://assets.ai3dmodel.app/pgc/text-to-3d.webp"
         ]
       },
       {
@@ -65,7 +65,7 @@
           }
         ],
         "images": [
-          "/images/features/login.png"
+          "https://assets.ai3dmodel.app/pgc/image-to-3d.webp"
         ]
       },
       {
@@ -86,7 +86,7 @@
           }
         ],
         "images": [
-          "/images/features/multi-image.webp"
+          "https://assets.ai3dmodel.app/pgc/multi-image-to-3d.webp"
         ]
       },
       {
@@ -206,18 +206,6 @@
         "description": "Convert product photos into interactive 3D models for e-commerce websites. Our AI 3D generator creates web-optimized models with real-time preview. Boost conversion rates with immersive 360° product views.",
         "image": "/placeholder.webp",
         "icon": "Monitor"
-      },
-      {
-        "title": "AR/VR Development",
-        "description": "Generate optimized 3D models for augmented and virtual reality applications. Our AI creates performance-optimized assets compatible with ARKit, ARCore, and WebXR standards.",
-        "image": "/placeholder.webp",
-        "icon": "Glasses"
-      },
-      {
-        "title": "Education & Training",
-        "description": "Create 3D educational content without modeling skills. Transform historical artifacts, scientific concepts, and teaching materials into interactive 3D models for enhanced learning experiences.",
-        "image": "/placeholder.webp",
-        "icon": "GraduationCap"
       }
     ]
   },
@@ -226,7 +214,33 @@
       "label": "TESTIMONIALS"
     },
     "title": "Trusted by 3D Professionals Worldwide",
-    "description": "Game developers, product designers, and 3D artists love AI 3D Model's AI 3D model generator"
+    "description": "Game developers, product designers, and 3D artists love AI 3D Model's AI 3D model generator",
+    "items": [
+      {
+        "content": "AI 3D Model helped us launch our 3D product catalog in just 2 days. The image-to-3D capability is incredible - we converted over 100 product photos into interactive 3D models. Our conversion rate increased by 45% since adding 360° product views.",
+        "author": {
+          "name": "Michael Chen",
+          "position": "Indie Maker"
+        },
+        "rating": 5.0
+      },
+      {
+        "content": "As a product manager with limited technical resources, AI 3D Model was a game-changer. We built and launched our 3D visualization feature with real-time preview in 3 days instead of 4 weeks. The documentation is exceptional.",
+        "author": {
+          "name": "Sarah Johnson",
+          "position": "CTO"
+        },
+        "rating": 4.8
+      },
+      {
+        "content": "The multi-view reconstruction feature is phenomenal. We used it for our game character pipeline and reduced our asset creation time by 80%. The quality matches what our artists create manually, but in a fraction of the time.",
+        "author": {
+          "name": "Alex Rodriguez",
+          "position": "Game Developer"
+        },
+        "rating": 5.0
+      }
+    ]
   },
   "FAQ": {
     "title": "FAQs About Our AI 3D Model Generator",

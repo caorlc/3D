@@ -44,7 +44,7 @@
           }
         ],
         "images": [
-          "/images/features/template1.webp"
+          "https://assets.ai3dmodel.app/pgc/text-to-3d.webp"
         ]
       },
       {
@@ -65,7 +65,7 @@
           }
         ],
         "images": [
-          "/images/features/login.png"
+          "https://assets.ai3dmodel.app/pgc/image-to-3d.webp"
         ]
       },
       {
@@ -86,7 +86,7 @@
           }
         ],
         "images": [
-          "/images/features/multi-image.webp"
+          "https://assets.ai3dmodel.app/pgc/multi-image-to-3d.webp"
         ]
       },
       {
@@ -206,30 +206,6 @@
         "description": "將產品照片轉換為電商網站的互動式立體展示。我們的 AI 3D 建模生成器建立網頁優化的作品，具有即時預覽功能。透過沉浸式 360° 產品視圖提升轉換率。",
         "image": "/placeholder.webp",
         "icon": "Monitor"
-      },
-      {
-        "title": "AR/VR 開發",
-        "description": "為擴增實境和虛擬實境應用產生優化的立體資產。我們的 AI 技術建立效能優化的作品，相容於 ARKit、ARCore 和 WebXR 標準。",
-        "image": "/placeholder.webp",
-        "icon": "Glasses"
-      },
-      {
-        "title": "教育與培訓",
-        "description": "無需專業技能即可建立教育內容。將歷史文物、科學概念和教學材料轉換為互動式立體展示，提升學習體驗。",
-        "image": "/placeholder.webp",
-        "icon": "GraduationCap"
-      },
-      {
-        "title": "建築視覺化",
-        "description": "快速將建築概念和設計草圖轉換為立體呈現。完美適合建築簡報、室內設計規劃和空間視覺化，加速從概念到展示的 3D 建模工作流程。",
-        "image": "/placeholder.webp",
-        "icon": "Building2"
-      },
-      {
-        "title": "影視與動畫",
-        "description": "為電影、動畫和視覺效果製作快速產生資產。我們的 AI 3D 建模生成器加速前期製作和概念開發，讓創意團隊專注於說故事。",
-        "image": "/placeholder.webp",
-        "icon": "Film"
       }
     ]
   },
@@ -238,7 +214,33 @@
       "label": "客戶見證"
     },
     "title": "受到全球專業人士信賴",
-    "description": "遊戲開發者、產品設計師和藝術家都喜愛 AI 3D Model 的生成式 AI 3D 建模工具"
+    "description": "遊戲開發者、產品設計師和藝術家都喜愛 AI 3D Model 的生成式 AI 3D 建模工具",
+    "items": [
+      {
+        "content": "AI 3D Model 幫助我們在短短 2 天內推出了 3D 產品目錄。圖片轉 3D 功能非常強大 - 我們將超過 100 張產品照片轉換為互動式立體模型。自從添加 360° 產品視圖後，轉換率提升了 45%。",
+        "author": {
+          "name": "陳明浩",
+          "position": "獨立開發者"
+        },
+        "rating": 5.0
+      },
+      {
+        "content": "作為技術資源有限的產品經理，AI 3D Model 改變了一切。我們在 3 天內建立並推出了帶有即時預覽的 3D 視覺化功能，而不是 4 週。文件資料非常完善。",
+        "author": {
+          "name": "王小玲",
+          "position": "技術長"
+        },
+        "rating": 4.8
+      },
+      {
+        "content": "多視角重建功能非常出色。我們將其用於遊戲角色流程，資產建立時間減少了 80%。品質與我們藝術家手動建立的相匹配，但時間只需一小部分。",
+        "author": {
+          "name": "李志強",
+          "position": "遊戲開發者"
+        },
+        "rating": 5.0
+      }
+    ]
   },
   "FAQ": {
     "title": "如何使用免費 AI 3D 工具？常見問題與解答",
