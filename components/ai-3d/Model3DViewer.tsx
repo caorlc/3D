@@ -31,6 +31,15 @@ import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { GridFloor } from "./GridFloor";
 
+// Declare model-viewer as a valid JSX element
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "model-viewer": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
+    }
+  }
+}
+
 interface Model3DViewerProps {
   modelUrl?: string;
   className?: string;
@@ -132,14 +141,6 @@ type ModelViewerElement = HTMLElement & {
   resetTurntableRotation?: () => void;
   jumpCameraToGoal?: () => void;
 };
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      "model-viewer": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & Record<string, any>;
-    }
-  }
-}
 
 type ModelBoundsCallback = (center: THREE.Vector3, radius: number) => void;
 
@@ -1322,48 +1323,37 @@ export default function Model3DViewer({
       )}
 
       {/* 3D Viewer Container */}
-      <div
-        ref={viewerContainerRef}
-        className="relative z-[1] w-full h-full"
-        style={transparentBackground ? { background: "transparent" } : viewerBackgroundStyle}
-        onMouseEnter={() => setIsViewerHovered(true)}
-        onMouseLeave={() => setIsViewerHovered(false)}
-      >
-        <div className="relative z-[1] h-full">
-          {!isClient ? (
-            <div className={cn("w-full h-full flex items-center justify-center", !transparentBackground && "bg-[#0f1419]")}>
-              <div className="text-gray-400 text-sm">加载中...</div>
-            </div>
-          ) : (
-            isModelViewerEngine ? (
-              isModelViewerScriptLoaded ? (
-                effectiveModelSrc ? (
-                  <model-viewer
-                    key={`${retryKey}-${effectiveModelSrc}`}
-                    ref={setModelViewerRef as any}
-                    src={effectiveModelSrc}
-                    style={{ width: "100%", height: "100%", background: "transparent", position: "relative", zIndex: 1 }}
-                    ar
-                    ar-modes="scene-viewer webxr quick-look"
-                    shadow-intensity="1"
-                    exposure="0.9"
-                    touch-action="pan-y"
-                    camera-controls
-                    interaction-prompt="auto"
-                    interaction-policy="always-allow"
-                    autoplay
-                    auto-rotate={isAutoRotating ? true : undefined}
-                    camera-orbit={initialModelViewerOrbit}
-                    environment-image="legacy"
-                    loading="lazy"
-                    reveal={generationStatus === "completed" ? "auto" : "interaction"}
-                    tone-mapping="aces"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm text-gray-400" style={viewerBackgroundStyle}>
-                    暂无可预览模型
-                  </div>
-                )
+      <div className="w-full h-full" onWheel={handleViewerWheel}>
+        {!isClient ? (
+          <div className={cn("w-full h-full flex items-center justify-center", !transparentBackground && "bg-[#0f1419]")}>
+            <div className="text-gray-400 text-sm">加载中...</div>
+          </div>
+        ) : (
+          isModelViewerEngine ? (
+            isModelViewerScriptLoaded ? (
+              effectiveModelSrc ? (
+                // @ts-ignore - model-viewer is a valid web component
+                <model-viewer
+                  key={`${retryKey}-${effectiveModelSrc}`}
+                  ref={setModelViewerRef as any}
+                  src={effectiveModelSrc}
+                  style={{ width: "100%", height: "100%", ...viewerBackgroundStyle }}
+                  ar
+                  ar-modes="scene-viewer webxr quick-look"
+                  shadow-intensity="1"
+                  exposure="0.9"
+                  touch-action="pan-y"
+                  camera-controls
+                  interaction-prompt="auto"
+                  interaction-policy="always-allow"
+                  autoplay
+                  auto-rotate={isAutoRotating ? true : undefined}
+                  camera-orbit={initialModelViewerOrbit}
+                  environment-image="legacy"
+                  loading="lazy"
+                  reveal={generationStatus === "completed" ? "auto" : "interaction"}
+                  tone-mapping="aces"
+                />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-sm text-gray-400" style={viewerBackgroundStyle}>
                   正在加载 3D 预览引擎...
@@ -1416,33 +1406,51 @@ export default function Model3DViewer({
                         return;
                       }
                     }
-                    setIsWebGLLost(true);
-                  };
-                  const handleRestored = () => {
-                    console.info("WebGL context restored");
-                    setIsWebGLLost(false);
-                    setModelLoadError(null);
-                  };
-                  canvas.addEventListener("webglcontextlost", handleLost as EventListener, false);
-                  canvas.addEventListener("webglcontextrestored", handleRestored as EventListener, false);
+                  }
+                  setIsWebGLLost(true);
+                };
+                const handleRestored = () => {
+                  console.info("WebGL context restored");
+                  setIsWebGLLost(false);
+                  setModelLoadError(null);
+                };
+                canvas.addEventListener("webglcontextlost", handleLost as EventListener, false);
+                canvas.addEventListener("webglcontextrestored", handleRestored as EventListener, false);
 
-                  // Ensure reasonable color pipeline
-                  // three r181 supports SRGBColorSpace on WebGLRenderer
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  gl.outputColorSpace = THREE.SRGBColorSpace;
-                  gl.toneMapping = THREE.ACESFilmicToneMapping;
-                  gl.toneMappingExposure = 1.0;
-                }}
-              >
-                {!isSceneReady && !modelLoadError && !isWebGLLost && <LoadingProgress transparentBackground={transparentBackground} />}
-                <Suspense fallback={null}>
-                  <GridFloor visible={backgroundMode === "grid"} transparentBackground={transparentBackground} />
-                  <ambientLight intensity={currentLightingPreset.ambientIntensity} color={currentLightingPreset.ambientColor} />
-                  <directionalLight
-                    position={currentLightingPreset.keyLight.position}
-                    intensity={currentLightingPreset.keyLight.intensity}
-                    color={currentLightingPreset.keyLight.color}
+                // Ensure reasonable color pipeline
+                // three r181 supports SRGBColorSpace on WebGLRenderer
+                // @ts-ignore - outputColorSpace is available in three.js r181+
+                gl.outputColorSpace = THREE.SRGBColorSpace;
+                gl.toneMapping = THREE.ACESFilmicToneMapping;
+                gl.toneMappingExposure = 1.0;
+              }}
+            >
+              {!isSceneReady && !modelLoadError && !isWebGLLost && <LoadingProgress transparentBackground={transparentBackground} />}
+              <Suspense fallback={null}>
+                <ambientLight intensity={currentLightingPreset.ambientIntensity} color={currentLightingPreset.ambientColor} />
+                <directionalLight
+                  position={currentLightingPreset.keyLight.position}
+                  intensity={currentLightingPreset.keyLight.intensity}
+                  color={currentLightingPreset.keyLight.color}
+                />
+                <directionalLight
+                  position={currentLightingPreset.fillLight.position}
+                  intensity={currentLightingPreset.fillLight.intensity}
+                  color={currentLightingPreset.fillLight.color}
+                />
+                <directionalLight
+                  position={currentLightingPreset.rimLight.position}
+                  intensity={currentLightingPreset.rimLight.intensity}
+                  color={currentLightingPreset.rimLight.color}
+                />
+                <pointLight position={[0, 10, 0]} intensity={0.35} />
+
+                {isDefaultModel ? (
+                  <DefaultModelWithFile
+                    autoRotate={isAutoRotating}
+                    defaultModelUrl={defaultModelUrl}
+                    onBoundsComputed={handleModelBoundsComputed}
+                    modelScaleFactor={modelScaleFactor}
                   />
                   <directionalLight
                     position={currentLightingPreset.fillLight.position}

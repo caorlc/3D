@@ -15,41 +15,6 @@
         "id": "pricing",
         "name": "Pricing",
         "href": "/#pricing"
-      },
-      {
-        "name": "AI Demo",
-        "href": "/ai-demo"
-      },
-      {
-        "name": "Blogs",
-        "href": "/blogs"
-      },
-      {
-        "name": "Demo",
-        "href": "#",
-        "items": [
-          {
-            "name": "Nexty Demo",
-            "href": "https://demo.nexty.dev/",
-            "target": "_blank",
-            "rel": "noopener noreferrer nofollow",
-            "description": "Next.js SaaS Boilerplate"
-          },
-          {
-            "name": "AI Image Generator Demo",
-            "href": "https://flux-kontext.nexty.dev/",
-            "target": "_blank",
-            "rel": "noopener noreferrer nofollow",
-            "description": "AI Image Generator Demo Based on Nexty.dev"
-          },
-          {
-            "name": "Directory Boilerplate Demo",
-            "href": "https://dofollow.tools/",
-            "target": "_blank",
-            "rel": "noopener noreferrer nofollow",
-            "description": "Directory Boilerplate Demo Based on Nexty.dev"
-          }
-        ]
       }
     ]
   },
@@ -115,16 +80,7 @@
           "title": "Support",
           "links": [
             {
-              "name": "Docs",
-              "href": "https://docs.nexty.dev/docs",
-              "target": "_blank"
-            },
-            {
-              "name": "Roadmap",
-              "href": "https://nexty.dev/roadmap"
-            },
-            {
-              "href": "mailto:hi@nexty.dev",
+              "href": "mailto:support@ai3dmodel.app",
               "name": "Contact Us"
             }
           ]
@@ -153,8 +109,8 @@
     }
   },
   "Home": {
-    "title": "Nexty.dev",
-    "tagLine": "A Modern Next.js Full-Stack SaaS Template",
+    "title": "AI 3D Model",
+    "tagLine": "",
     "description": "A production-ready Next.js and Supabase starter template for building modern SaaS applications. Launch your content, AI, or subscription service faster."
   },
   "Login": {
