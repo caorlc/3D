@@ -110,8 +110,8 @@
   },
   "Home": {
     "title": "AI 3D Model",
-    "tagLine": "",
-    "description": "A production-ready Next.js and Supabase starter template for building modern SaaS applications. Launch your content, AI, or subscription service faster."
+    "tagLine": "Effortless AI-Powered 3D Model Generation",
+    "description": "Innovative AI 3D model generator platform. Instantly create high-fidelity 3D models from text or images. Experience professional-grade results, powered by AI."
   },
   "Login": {
     "title": "Welcome back",

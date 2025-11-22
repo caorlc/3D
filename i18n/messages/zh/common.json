@@ -109,9 +109,9 @@
     }
   },
   "Home": {
-    "title": "Nexty.dev",
-    "tagLine": "多場景 Next.js 全端 SaaS 開發模板",
-    "description": "Nexty 是一個功能齊全的 Next.js SaaS 全端模板，讓您能夠快速建構各種商業網站，無論是內容站、工具站還是整合 AI 能力的付費網站。"
+    "title": "AI 3D Model",
+    "tagLine": "輕鬆生成AI 3D建模",
+    "description": "創新的 AI 3D模型生成平台，讓你透過文字或圖片快速建立高精細三維模型，輕鬆體驗專業等級的3D內容創作。"
   },
   "Login": {
     "title": "歡迎回來",
