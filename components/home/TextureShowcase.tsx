@@ -46,7 +46,7 @@ const TextureShowcaseCard = ({ card }: { card: TextureCard }) => {
   }, [inView]);
 
   return (
-    <div ref={ref} className="relative aspect-[4/3] w-full bg-[#0f1419]">
+    <div ref={ref} className="relative w-full bg-[#0f1419] rounded-3xl overflow-hidden min-h-[360px] md:min-h-[460px]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#1a1f2e] via-[#0f1419] to-[#1a1f2e]" />
       <div className="relative w-full h-full">
         {hasEnteredView ? (
@@ -56,6 +56,7 @@ const TextureShowcaseCard = ({ card }: { card: TextureCard }) => {
             autoRotate
             showInfo={false}
             showControls={false}
+            transparentBackground={false}
             className="w-full h-full"
           />
         ) : (

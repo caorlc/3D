@@ -1,3 +1,4 @@
+import { getPublicPricingPlans } from "@/actions/prices/public";
 import AI3DInteraction from "@/components/ai-3d";
 import { Locale } from "@/i18n/routing";
 import { constructMetadata } from "@/lib/metadata";
@@ -29,10 +30,14 @@ export async function generateMetadata({
   });
 }
 
-export default function AI3DPage() {
+export default async function AI3DPage() {
+  // Fetch pricing plans for AI3DInteraction
+  const pricingResult = await getPublicPricingPlans();
+  const pricingPlans = pricingResult.success ? pricingResult.data : [];
+
   return (
     <FullscreenWrapper>
-      <AI3DInteraction />
+      <AI3DInteraction pricingPlans={pricingPlans} />
     </FullscreenWrapper>
   );
 }

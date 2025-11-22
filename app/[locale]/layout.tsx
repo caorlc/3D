@@ -88,7 +88,8 @@ export default async function LocaleLayout({
           <ThemeProvider
             attribute="class"
             defaultTheme={siteConfig.defaultNextTheme}
-            enableSystem
+            enableSystem={false}
+            forcedTheme="dark"
           >
             {messages.LanguageDetection && <LanguageDetectionAlert />}
 
