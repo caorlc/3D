@@ -1360,174 +1360,158 @@ export default function Model3DViewer({
                 </div>
               )
             ) : (
-              <Canvas
-                key={retryKey}
-                camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 1000 }}
-                dpr={1}
-                frameloop="always"
-                gl={{
-                  antialias: false,
-                  alpha: transparentBackground,
-                  powerPreference: "high-performance",
-                  failIfMajorPerformanceCaveat: false,
-                }}
-                style={{ width: "100%", height: "100%", background: "transparent", position: "relative", zIndex: 1 }}
-                onCreated={({ camera, gl }) => {
-                  cameraRef.current = camera as THREE.PerspectiveCamera;
-                  rendererRef.current = gl as THREE.WebGLRenderer;
+              <div className="flex h-full w-full items-center justify-center text-sm text-gray-400" style={viewerBackgroundStyle}>
+                正在加载 model-viewer 脚本...
+              </div>
+            )
+          ) : (
+            <Canvas
+              key={retryKey}
+              camera={{ position: [0, 0, 5], fov: 50, near: 0.1, far: 1000 }}
+              dpr={1}
+              frameloop="always"
+              gl={{
+                antialias: false,
+                alpha: transparentBackground,
+                powerPreference: "high-performance",
+                failIfMajorPerformanceCaveat: false,
+              }}
+              style={{ width: "100%", height: "100%", background: "transparent", position: "relative", zIndex: 1 }}
+              onCreated={({ camera, gl }) => {
+                cameraRef.current = camera as THREE.PerspectiveCamera;
+                rendererRef.current = gl as THREE.WebGLRenderer;
 
-                  // Get canvas element
-                  const canvas = gl.domElement;
+                // Get canvas element
+                const canvas = gl.domElement;
 
-                  // Set transparent background if needed
-                  if (transparentBackground || backgroundMode === "grid") {
-                    gl.setClearColor(0x000000, 0); // Transparent to show parent background/pattern
-                  } else {
-                    gl.setClearColor(0x0b111b, 1);
-                  }
-                  canvas.style.backgroundColor = "transparent";
-                  canvas.style.background = "transparent";
-                  gl.clear();
+                // Set transparent background if needed
+                if (transparentBackground || backgroundMode === "grid") {
+                  gl.setClearColor(0x000000, 0); // Transparent to show parent background/pattern
+                } else {
+                  gl.setClearColor(0x0b111b, 1);
+                }
+                canvas.style.backgroundColor = "transparent";
+                canvas.style.background = "transparent";
+                gl.clear();
 
-                  // Listen for WebGL context loss/restoration
-                  const handleLost = (e: Event) => {
-                    e.preventDefault();
-                    const webglEvent = e as WebGLContextEvent;
-                    console.warn("WebGL context lost", webglEvent);
+                // Listen for WebGL context loss/restoration
+                const handleLost = (e: Event) => {
+                  e.preventDefault();
+                  const webglEvent = e as WebGLContextEvent;
+                  console.warn("WebGL context lost", webglEvent);
 
-                    // Check if it's a memory error by checking the WebGL context
-                    const webglContext = gl.getContext() as WebGLRenderingContext | null;
-                    if (webglContext) {
-                      const glError = webglContext.getError();
-                      // OUT_OF_MEMORY = 0x0505 = 1285, but error code 5 is also common
-                      if (glError === 0x0505 || glError === 5 || (webglEvent as any).statusMessage?.includes("memory")) {
-                        console.error("WebGL OUT_OF_MEMORY error detected");
-                        handleModelLoadFailure("模型文件过大导致 GPU 内存不足，请尝试使用更小的模型或刷新页面");
-                        return;
-                      }
+                  // Check if it's a memory error by checking the WebGL context
+                  const webglContext = gl.getContext() as WebGLRenderingContext | null;
+                  if (webglContext) {
+                    const glError = webglContext.getError();
+                    // OUT_OF_MEMORY = 0x0505 = 1285, but error code 5 is also common
+                    if (glError === 0x0505 || glError === 5 || (webglEvent as any).statusMessage?.includes("memory")) {
+                      console.error("WebGL OUT_OF_MEMORY error detected");
+                      handleModelLoadFailure("模型文件过大导致 GPU 内存不足，请尝试使用更小的模型或刷新页面");
+                      return;
                     }
                   }
                   setIsWebGLLost(true);
                 };
-                const handleRestored = () => {
-                  console.info("WebGL context restored");
-                  setIsWebGLLost(false);
-                  setModelLoadError(null);
-                };
-                canvas.addEventListener("webglcontextlost", handleLost as EventListener, false);
-                canvas.addEventListener("webglcontextrestored", handleRestored as EventListener, false);
+              const handleRestored = () => {
+                console.info("WebGL context restored");
+                setIsWebGLLost(false);
+                setModelLoadError(null);
+              };
+              canvas.addEventListener("webglcontextlost", handleLost as EventListener, false);
+              canvas.addEventListener("webglcontextrestored", handleRestored as EventListener, false);
 
-                // Ensure reasonable color pipeline
-                // three r181 supports SRGBColorSpace on WebGLRenderer
-                // @ts-ignore - outputColorSpace is available in three.js r181+
-                gl.outputColorSpace = THREE.SRGBColorSpace;
-                gl.toneMapping = THREE.ACESFilmicToneMapping;
-                gl.toneMappingExposure = 1.0;
-              }}
-            >
-              {!isSceneReady && !modelLoadError && !isWebGLLost && <LoadingProgress transparentBackground={transparentBackground} />}
-              <Suspense fallback={null}>
-                <ambientLight intensity={currentLightingPreset.ambientIntensity} color={currentLightingPreset.ambientColor} />
-                <directionalLight
-                  position={currentLightingPreset.keyLight.position}
-                  intensity={currentLightingPreset.keyLight.intensity}
-                  color={currentLightingPreset.keyLight.color}
-                />
-                <directionalLight
-                  position={currentLightingPreset.fillLight.position}
-                  intensity={currentLightingPreset.fillLight.intensity}
-                  color={currentLightingPreset.fillLight.color}
-                />
-                <directionalLight
-                  position={currentLightingPreset.rimLight.position}
-                  intensity={currentLightingPreset.rimLight.intensity}
-                  color={currentLightingPreset.rimLight.color}
-                />
-                <pointLight position={[0, 10, 0]} intensity={0.35} />
+              // Ensure reasonable color pipeline
+              // three r181 supports SRGBColorSpace on WebGLRenderer
+              // @ts-ignore - outputColorSpace is available in three.js r181+
+              gl.outputColorSpace = THREE.SRGBColorSpace;
+              gl.toneMapping = THREE.ACESFilmicToneMapping;
+              gl.toneMappingExposure = 1.0;
+            }}
+          >
+            {!isSceneReady && !modelLoadError && !isWebGLLost && <LoadingProgress transparentBackground={transparentBackground} />}
+            <Suspense fallback={null}>
+              <ambientLight intensity={currentLightingPreset.ambientIntensity} color={currentLightingPreset.ambientColor} />
+              <directionalLight
+                position={currentLightingPreset.keyLight.position}
+                intensity={currentLightingPreset.keyLight.intensity}
+                color={currentLightingPreset.keyLight.color}
+              />
+              <directionalLight
+                position={currentLightingPreset.fillLight.position}
+                intensity={currentLightingPreset.fillLight.intensity}
+                color={currentLightingPreset.fillLight.color}
+              />
+              <directionalLight
+                position={currentLightingPreset.rimLight.position}
+                intensity={currentLightingPreset.rimLight.intensity}
+                color={currentLightingPreset.rimLight.color}
+              />
+              <pointLight position={[0, 10, 0]} intensity={0.35} />
 
-                {isDefaultModel ? (
-                  <DefaultModelWithFile
-                    autoRotate={isAutoRotating}
-                    defaultModelUrl={defaultModelUrl}
-                    onBoundsComputed={handleModelBoundsComputed}
-                    modelScaleFactor={modelScaleFactor}
-                  />
-                  <directionalLight
-                    position={currentLightingPreset.fillLight.position}
-                    intensity={currentLightingPreset.fillLight.intensity}
-                    color={currentLightingPreset.fillLight.color}
-                  />
-                  <directionalLight
-                    position={currentLightingPreset.rimLight.position}
-                    intensity={currentLightingPreset.rimLight.intensity}
-                    color={currentLightingPreset.rimLight.color}
-                  />
-                  <pointLight position={[0, 10, 0]} intensity={0.35} />
+              {isDefaultModel ? (
+                <DefaultModelWithFile
+                  autoRotate={isAutoRotating}
+                  defaultModelUrl={defaultModelUrl}
+                  onBoundsComputed={handleModelBoundsComputed}
+                  modelScaleFactor={modelScaleFactor}
+                />
+              ) : modelUrl ? (
+                  <ModelErrorBoundary
+                    fallback={
+                      <mesh>
+                        <boxGeometry args={[1, 1, 1]} />
+                        <meshStandardMaterial color="#ff0000" />
+                      </mesh>
+                    }
+                    onError={(error) => {
+                      console.error("[Model3DViewer] Model loading error:", error);
+                      const errorMsg = error.message || error.toString();
 
-                  {isDefaultModel ? (
-                    <DefaultModelWithFile
+                      if (errorMsg?.includes("timeout") || errorMsg?.includes("Failed to fetch")) {
+                        handleModelLoadFailure("模型文件过大或网络连接超时，请稍后重试");
+                      } else if (errorMsg?.includes("CORS") || errorMsg?.includes("cross-origin")) {
+                        handleModelLoadFailure("跨域访问被阻止，请联系管理员");
+                      } else if (
+                        errorMsg?.includes("memory") ||
+                        errorMsg?.includes("Memory") ||
+                        errorMsg?.includes("OUT_OF_MEMORY") ||
+                        errorMsg?.includes("错误代码：5") ||
+                        (error as any).code === 5
+                      ) {
+                        handleModelLoadFailure("模型文件过大导致内存不足，请尝试使用更小的模型或刷新页面");
+                      } else if (errorMsg?.includes("WebGL") || errorMsg?.includes("webgl")) {
+                        handleModelLoadFailure("WebGL 渲染错误，请检查浏览器是否支持 WebGL 或刷新页面");
+                      } else {
+                        handleModelLoadFailure("模型加载失败，请检查文件格式或重试。如果问题持续，可能是模型文件过大");
+                      }
+                    }}
+                  >
+                    <Model
+                      url={modelUrl}
                       autoRotate={isAutoRotating}
-                      defaultModelUrl={defaultModelUrl}
+                      showTexture={showTexture}
                       onBoundsComputed={handleModelBoundsComputed}
                       modelScaleFactor={modelScaleFactor}
                     />
-                  ) : modelUrl ? (
-                    <ModelErrorBoundary
-                      fallback={
-                        <mesh>
-                          <boxGeometry args={[1, 1, 1]} />
-                          <meshStandardMaterial color="#ff0000" />
-                        </mesh>
-                      }
-                      onError={(error) => {
-                        console.error("[Model3DViewer] Model loading error:", error);
-                        const errorMsg = error.message || error.toString();
+                  </ModelErrorBoundary>
+                ) : null}
 
-                        if (errorMsg?.includes("timeout") || errorMsg?.includes("Failed to fetch")) {
-                          handleModelLoadFailure("模型文件过大或网络连接超时，请稍后重试");
-                        } else if (errorMsg?.includes("CORS") || errorMsg?.includes("cross-origin")) {
-                          handleModelLoadFailure("跨域访问被阻止，请联系管理员");
-                        } else if (
-                          errorMsg?.includes("memory") ||
-                          errorMsg?.includes("Memory") ||
-                          errorMsg?.includes("OUT_OF_MEMORY") ||
-                          errorMsg?.includes("错误代码：5") ||
-                          (error as any).code === 5
-                        ) {
-                          handleModelLoadFailure("模型文件过大导致内存不足，请尝试使用更小的模型或刷新页面");
-                        } else if (errorMsg?.includes("WebGL") || errorMsg?.includes("webgl")) {
-                          handleModelLoadFailure("WebGL 渲染错误，请检查浏览器是否支持 WebGL 或刷新页面");
-                        } else {
-                          handleModelLoadFailure("模型加载失败，请检查文件格式或重试。如果问题持续，可能是模型文件过大");
-                        }
-                      }}
-                    >
-                      <Model
-                        url={modelUrl}
-                        autoRotate={isAutoRotating}
-                        showTexture={showTexture}
-                        onBoundsComputed={handleModelBoundsComputed}
-                        modelScaleFactor={modelScaleFactor}
-                      />
-                    </ModelErrorBoundary>
-                  ) : null}
-
-                  <OrbitControls
-                    ref={controlsRef}
-                    enableZoom={enableZoom}
-                    enablePan={enableZoom}
-                    enableRotate={enableZoom}
-                    autoRotate={isAutoRotating}
-                    autoRotateSpeed={1}
-                    minDistance={0.05}
-                    maxDistance={Number.MAX_VALUE}
-                    target={[0, 0, 0]}
-                  />
-                </Suspense>
-              </Canvas>
-            )
-          )}
-        </div>
+                <OrbitControls
+                  ref={controlsRef}
+                  enableZoom={enableZoom}
+                  enablePan={enableZoom}
+                  enableRotate={enableZoom}
+                  autoRotate={isAutoRotating}
+                  autoRotateSpeed={1}
+                  minDistance={0.05}
+                  maxDistance={Number.MAX_VALUE}
+                  target={[0, 0, 0]}
+                />
+              </Suspense>
+            </Canvas>
+          )
+        )}
       </div>
 
       {/* Controls - Bottom */}

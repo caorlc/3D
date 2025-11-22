@@ -79,14 +79,6 @@ export default function AI3DInteraction({ pricingPlans = [] }: AI3DInteractionPr
     [t]
   );
 
-  // Define image slots for multiple image upload
-  const imageSlots = [
-    { label: t("frontView") || "Front View", required: true },
-    { label: t("sideView") || "Side View", required: false },
-    { label: t("backView") || "Back View", required: false },
-    { label: t("topView") || "Top View", required: false },
-  ];
-
   useEffect(() => {
     setUploadedFiles([]);
     setUploadedPreviews([]);
