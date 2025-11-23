@@ -1,9 +1,13 @@
+"use client";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { MousePointerClick } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type FAQItem = {
@@ -15,6 +19,7 @@ export default function FAQ() {
   const t = useTranslations("Landing.FAQ");
 
   const faqs: FAQItem[] = t.raw("items");
+  const ctaText = t("cta.button");
 
   return (
     <section id="testimonials" className="py-20">
@@ -23,9 +28,20 @@ export default function FAQ() {
           <h2 className="text-center z-10 text-lg md:text-5xl font-sans font-semibold mb-4">
             <span className="title-gradient">{t("title")}</span>
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
             {t("description")}
           </p>
+          <div className="flex justify-center">
+            <div
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="cursor-pointer"
+            >
+              <RainbowButton>
+                <MousePointerClick className="w-5 h-5" />
+                {ctaText}
+              </RainbowButton>
+            </div>
+          </div>
         </div>
 
         <Accordion

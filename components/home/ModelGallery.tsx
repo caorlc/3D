@@ -59,11 +59,12 @@ const GalleryCard = ({ card, animationDelay = 0, className = "", onDownload }: G
       <div className="absolute inset-x-4 bottom-4 flex justify-end pointer-events-none z-10">
         <button
           type="button"
-          className="pointer-events-auto rounded-full bg-white/10 px-4 py-2 text-sm text-white backdrop-blur border border-white/20 hover:bg-white/20 flex items-center gap-2 transition-colors"
+          className="pointer-events-auto group relative overflow-hidden rounded-full bg-gradient-to-r from-indigo-400/60 via-purple-400/60 to-pink-400/60 px-3 py-1.5 text-xs font-medium text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center gap-1.5 backdrop-blur-sm border border-white/20"
           onClick={handleDownload}
         >
-          <Download className="w-4 h-4" />
-          {t("downloadButton")}
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/70 via-purple-500/70 to-pink-500/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <Download className="w-3 h-3 relative z-10" />
+          <span className="relative z-10">{t("downloadButton")}</span>
         </button>
       </div>
     </div>

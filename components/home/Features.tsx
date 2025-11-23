@@ -1,3 +1,5 @@
+"use client";
+
 import { ImagePreview } from "@/components/shared/ImagePreview";
 import {
   Carousel,
@@ -6,7 +8,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Check } from "lucide-react";
+import { RainbowButton } from "@/components/ui/rainbow-button";
+import { MousePointerClick } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 
@@ -20,12 +23,12 @@ type Feature = {
   images?: string[];
 };
 
-const FeatureCard = ({ feature, reverse = false }: { feature: Feature; reverse?: boolean }) => {
+const FeatureCard = ({ feature, reverse = false, ctaText }: { feature: Feature; reverse?: boolean; ctaText: string }) => {
   return (
     <div key={feature.title} className="w-full py-4">
       <div className="container mx-auto">
         <div className="grid container p-8 grid-cols-1 gap-8 items-center lg:grid-cols-2">
-          <div className={reverse ? "flex gap-10 flex-col order-2 lg:order-2" : "flex gap-10 flex-col"}>
+          <div className={reverse ? "flex gap-8 flex-col order-2 lg:order-2" : "flex gap-8 flex-col"}>
             <div className="flex gap-4 flex-col">
               <div className="flex gap-2 flex-col">
                 <h3 className={reverse ? "text-3xl lg:text-5xl tracking-tighter max-w-xl text-right font-regular" : "text-3xl lg:text-5xl tracking-tighter max-w-xl text-left font-regular"}>
@@ -36,21 +39,16 @@ const FeatureCard = ({ feature, reverse = false }: { feature: Feature; reverse?:
                 </p>
               </div>
             </div>
-            <div className="grid lg:pl-6 grid-cols-1 sm:grid-cols-3 items-start lg:grid-cols-1 gap-6">
-              {feature.details?.map((detail) => (
-                <div
-                  key={detail.title}
-                  className="flex flex-row gap-6 items-start"
-                >
-                  <Check className="w-4 h-4 mt-2 text-primary shrink-0" />
-                  <div className="flex flex-col gap-1">
-                    <p>{detail.title}</p>
-                    <p className="text-muted-foreground text-sm">
-                      {detail.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className={reverse ? "flex justify-end" : "flex justify-start"}>
+              <div
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="cursor-pointer"
+              >
+                <RainbowButton>
+                  <MousePointerClick className="w-5 h-5" />
+                  {ctaText}
+                </RainbowButton>
+              </div>
             </div>
           </div>
           <div className={reverse ? "rounded-lg p-2 border order-1 lg:order-1" : "rounded-lg p-2 border"}>
@@ -98,6 +96,7 @@ export default function Features() {
   const t = useTranslations("Landing.Features");
 
   const features: Feature[] = t.raw("items");
+  const ctaText = t("cta.button");
 
   return (
     <section id="features" className="py-20">
@@ -105,7 +104,14 @@ export default function Features() {
         <div className="">
           {features.slice(0, 3).map((feature, index) => {
             const reverse = index % 2 === 1;
-            return <FeatureCard key={feature.title} feature={feature} reverse={reverse} />;
+            return (
+              <FeatureCard
+                key={feature.title}
+                feature={feature}
+                reverse={reverse}
+                ctaText={ctaText}
+              />
+            );
           })}
         </div>
 
