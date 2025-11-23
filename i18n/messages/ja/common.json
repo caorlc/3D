@@ -95,7 +95,7 @@
             },
             {
               "href": "/zh",
-              "name": "中文",
+              "name": "繁體中文",
               "useA": true
             },
             {
@@ -109,9 +109,9 @@
     }
   },
   "Home": {
-    "title": "Nexty.dev",
-    "tagLine": "最新の Next.js フルスタック SaaS テンプレート",
-    "description": "Next.js と Supabase を活用した本格的な SaaS 開発キット。コンテンツ配信、AI ツール、サブスクリプションサービスを迅速に構築できます。"
+    "title": "AI 3D Model",
+    "tagLine": "AI 3Dモデル簡単に生成",
+    "description": "AIによる革新的な3Dモデル生成プラットフォーム。テキストや画像から高精細な3Dモデルを素早く作成。プロフェッショナル品質を手軽に体験できます。"
   },
   "Login": {
     "title": "おかえりなさい",
